@@ -1,9 +1,9 @@
 ///
-/// @file System.h
+/// @file KeyboardState.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
-/// Copyright (c) MMX by Royal Society of Secret Design
+/// Copyright (c) MMX by The Secret Design Collective
 /// All rights reserved
 ///
 /// Redistribution and use in source and binary forms, with or without
@@ -14,7 +14,7 @@
 ///    * Redistributions in binary form must reproduce the above copyright notice,
 /// 		this list of conditions and the following disclaimer in the documentation
 /// 		and/or other materials provided with the distribution.
-///    * Neither the name of Royal Society of Secret Design nor the names of its
+///    * Neither the name of The Secret Design Collective nor the names of its
 /// 		contributors may be used to endorse or promote products derived from
 /// 		this software without specific prior written permission.
 ///
@@ -29,14 +29,51 @@
 /// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
-#ifndef RSSD_CORE_SYSTEM
-#define RSSD_CORE_SYSTEM
 
-#include "system/Preprocess.h"
-#include "system/Platform.h"
-#include "system/ThirdParty.h"
-#include "system/Type.h"
-#include "system/Strid.h"
-// #include "system/Error.h"
+#ifndef RSSD_INPUT_KEYSTATE_H
+#define RSSD_INPUT_KEYSTATE_H
 
-#endif // RSSD_CORE_SYSTEM
+#include "input/device/Device.h"
+
+namespace RSSD {
+namespace Input {
+
+class Keyboard : public Device
+{
+public:
+  class State : public Device::State
+  {
+  public:
+    State();
+    virtual ~State();
+    const uint32_t getKeyCode() const { return this->mKeyCode; }
+    const void setKeyCode(const uint32_t value) { this->mKeyCode = value; }
+    virtual bool update(const float64_t elapsed);
+
+  protected:
+    uint32_t mKeyCode;
+  }; /// class State
+
+  class Event : public Device::Event
+  {
+  public:
+    enum Type
+    {
+      PRESS = 1<<0,
+      RELEASE = 1<<1,
+      COUNT = 1<<2
+    }; /// enum Type
+
+    Event(const uint32_t event = Event::COUNT);
+    virtual ~Event();
+  }; /// class Event
+
+  Keyboard();
+  virtual ~Keyboard();
+  virtual bool update(const float64_t elapsed);
+}; /// class Keyboard
+
+} /// namespace Input
+} /// namespace RSSD
+
+#endif // RSSD_INPUT_KEYSTATE_H

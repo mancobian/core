@@ -10,13 +10,13 @@
 /// modification, are permitted provided that the following conditions are met:
 ///
 ///    * Redistributions of source code must retain the above copyright notice,
-/// 		this list of conditions and the following disclaimer.
+///     this list of conditions and the following disclaimer.
 ///    * Redistributions in binary form must reproduce the above copyright notice,
-/// 		this list of conditions and the following disclaimer in the documentation
-/// 		and/or other materials provided with the distribution.
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
 ///    * Neither the name of Royal Society of Secret Design nor the names of its
-/// 		contributors may be used to endorse or promote products derived from
-/// 		this software without specific prior written permission.
+///     contributors may be used to endorse or promote products derived from
+///     this software without specific prior written permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 /// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -37,8 +37,7 @@
 /// Includes
 ///
 
-#include <boost/assign.hpp>
-#include "../System.h"
+#include "System"
 
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 
@@ -99,10 +98,10 @@ template<class Path> const char* dotdot<Path>::value = "..";
 BOOST_FS_FUNC(bool)
 is_hidden(const Path &target_path)
 {
-	std::string filename = target_path.filename();
-	if (!filename.empty() && filename[0] == '.')
-		return true;
-	return false;
+  std::string filename = target_path.filename();
+  if (!filename.empty() && filename[0] == '.')
+    return true;
+  return false;
 }
 
 BOOST_FS_FUNC(Path)
@@ -322,8 +321,8 @@ typedef boost::filesystem::basic_filesystem_error<Path> FilesystemError;
 } // namespace filesystem
 } // namespace boost
 
-namespace rssd {
+namespace RSSD {
 namespace filesystem = boost::filesystem;
-} // namespace rssd
+} // namespace RSSD
 
 #endif // RSSD_FILESYSTEM_HELPERPATH_H

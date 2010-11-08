@@ -33,19 +33,19 @@
 #ifndef RSSD_CORE_PATTERN_PUBLISHER_H
 #define RSSD_CORE_PATTERN_PUBLISHER_H
 
-#include "../System.h"
+#include "System"
 #include "Manager.h"
 
-namespace rssd {
-namespace pattern {
+namespace RSSD {
+namespace Pattern {
 class Publication;
 class Subscriber;
 class Publisher;
 }
 }
 
-namespace rssd {
-namespace pattern {
+namespace RSSD {
+namespace Pattern {
 
 class Publication
 {
@@ -70,10 +70,10 @@ public:
 	virtual bool onSubscriptionPublished(Publication *publication) = 0;
 }; // class Subscriber
 
-class Publisher : virtual public pattern::Manager<Subscriber*>
+class Publisher : virtual public Pattern::Manager<Subscriber*>
 {
 public:
-	typedef pattern::Manager<Subscriber*> Base;
+	typedef Pattern::Manager<Subscriber*> Base;
 
 public:
 	virtual ~Publisher()
@@ -95,7 +95,7 @@ public:
 	}
 }; // class Publisher
 
-} // namespace pattern
-} // namespace rssd
+} // namespace Pattern
+} // namespace RSSD
 
 #endif // RSSD_CORE_PATTERN_PUBLISHER_H

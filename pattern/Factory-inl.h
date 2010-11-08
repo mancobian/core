@@ -93,7 +93,7 @@ Factory<PRODUCT>::Factory() // : _type(FactoryManager<PRODUCT>::getPointer()->ge
 template <typename PRODUCT>
 Factory<PRODUCT>::~Factory()
 {
-	pattern::Manager<PRODUCT*>::clear();
+	Pattern::Manager<PRODUCT*>::clear();
 }
 
 template <typename PRODUCT>

@@ -34,142 +34,90 @@
 #define RSSD_CORE_SYSTEM_STRID_H
 
 #include "Type.h"
+#include "Concurrency.h"
 #include "ThirdParty.h"
 
-namespace rssd {
-namespace system {
+namespace RSSD {
 
 /// @note 'id' is a keyword in some languages.
 /// @todo Consider alternatives to 'id' as a variable name.
-class strid
+class Strid
 {
 public:
-	typedef std::map<std::string, uint32_t> strid_m;
-	typedef std::set<uint32_t> id_s;
+  typedef std::map<std::string, uint32_t> Strid_m;
+  typedef std::set<uint32_t> id_s;
 
 public:
-    strid() :
-        _id(0),
-        _text("__uninitialized__")
+  Strid();
+  Strid(const char *text);
+  Strid(uint32_t id, const char *text);
+  Strid(const Strid &rhs);
+  ~Strid();
+  static uint32_t getHash(const std::string &text);
+  uint32_t getId() const { return this->_id; }
+  std::string getText() const { return this->_text; }
+
+  inline Strid& operator =(const char *value)
+  {
+    this->_text.assign(value);
+    this->_id = Strid::getHash(this->_text);
+    return *this;
+  }
+
+  inline bool operator <(const char *value) const
+  {
+    return (this->_id < Strid::getHash(value));
+  }
+
+  inline bool operator ==(const char *value) const
+  {
+    return (this->_id == Strid::getHash(value));
+  }
+
+  inline bool operator <(const uint32_t value) const
+  {
+    return (this->_id < value);
+  }
+
+  inline bool operator ==(const uint32_t value) const
+  {
+    return (this->_id == value);
+  }
+
+  inline Strid& operator =(const uint32_t value)
+  {
+    this->_id = value;
+    return *this;
+  }
+
+  inline bool operator <(const Strid &value) const
+  {
+    return (this->_id < value._id);
+  }
+
+  inline bool operator ==(const Strid &value) const
+  {
+    return (this->_id == value._id);
+  }
+
+  inline Strid& operator =(const Strid &value)
+  {
+    if (this != &value)
     {
+      this->_id = value._id;
+      this->_text = value._text;
     }
-
-    strid(const char *text) :
-        _id(0),
-        _text(text)
-    {
-        this->_id = get_hash(this->_text);
-    }
-
-    strid(uint32_t id, const char *text) :
-        _id(id),
-        _text(text)
-    {
-    }
-
-    strid(const strid &rhs) :
-        _id(rhs._id),
-        _text(rhs._text)
-    {
-    }
-
-    ~strid()
-    {
-    }
-
-public:
-    strid& operator =(const char *value)
-    {
-        this->_text.assign(value);
-        this->_id = strid::get_hash(this->_text);
-        return *this;
-    }
-
-    bool operator <(const char *value) const
-    {
-        return (this->_id < strid::get_hash(value));
-    }
-
-    bool operator ==(const char *value) const
-    {
-        return (this->_id == strid::get_hash(value));
-    }
-
-    bool operator <(const uint32_t value) const
-    {
-        return (this->_id < value);
-    }
-
-    bool operator ==(const uint32_t value) const
-    {
-        return (this->_id == value);
-    }
-
-    strid& operator =(const uint32_t value)
-    {
-        this->_id = value;
-        return *this;
-    }
-
-    bool operator <(const strid &value) const
-    {
-        return (this->_id < value._id);
-    }
-
-    bool operator ==(const strid &value) const
-    {
-        return (this->_id == value._id);
-    }
-
-    strid& operator =(const strid &value)
-    {
-        if (this != &value)
-        {
-            this->_id = value._id;
-            this->_text = value._text;
-        }
-        return *this;
-    }
-
-public:
-    static uint32_t get_hash(const std::string &text)
-    {
-        // Concurrency lock
-        static boost::mutex MUTEX;
-        boost::mutex::scoped_lock lock(MUTEX);
-
-        // Return ID if input string has already been hashed
-        if (strid::HASHMAP.find(text) != HASHMAP.end())
-            return HASHMAP[text];
-
-        // Create string hash
-        std::locale c_locale; // the "C" locale
-        const std::collate<char>& collate_char = std::use_facet<std::collate<char> >(c_locale);
-        uint32_t id = collate_char.hash(text.data(), text.data() + text.length());
-        assert (strid::HASHSET.find(id) == HASHSET.end());
-
-        // Store string hash
-        HASHMAP.insert(std::make_pair(text, id));
-        HASHSET.insert(id);
-        return id;
-    }
+    return *this;
+  }
 
 protected:
-	static id_s HASHSET;
-	static strid_m HASHMAP;
+  static boost::mutex HASHMUTEX;
+  static id_s HASHSET;
+  static Strid_m HASHMAP;
+  uint32_t _id;
+  std::string _text;
+}; // class Strid
 
-protected:
-	uint32_t _id;
-	std::string _text;
-}; // class strid
-
-} // namespace system
-} // namespace rssd
-
-///
-/// Macros
-///
-
-#define STRID(VALUE) rssd::system::strid::get_hash(#VALUE);
+} // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_STRID_H

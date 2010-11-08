@@ -37,15 +37,13 @@
 /// Boost
 ///
 
+#include <boost/assign.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/utility.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
 #include <boost/utility.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/smart_ptr.hpp>
 #include <boost/variant.hpp>
 
 #endif // RSSD_CORE_SYSTEM_THIRDPARTY_H

@@ -48,9 +48,10 @@
 #include <locale>
 #include <iostream>
 #include <fstream>
+#include <tr1/memory>
 #include "ThirdParty.h"
 
-namespace rssd {
+namespace RSSD {
 
 ///
 /// Defines
@@ -76,6 +77,7 @@ typedef std::string string_t;
 #elif defined(RSSD_PLATFORM_WINDOWS)
 typedef std::wstring string_t;
 #endif
+#define SharedPointer boost::shared_ptr
 
 ///
 /// Macros
@@ -154,7 +156,7 @@ typedef boost::variant<
 
 // namespace Math = Eigen;
 
-} // namespace rssd
+} // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_TYPES_H
 

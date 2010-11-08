@@ -33,8 +33,8 @@
 #ifndef RSSD_FILESYSTEM_ERROR_H
 #define RSSD_FILESYSTEM_ERROR_H
 
-namespace rssd {
-namespace system {
+namespace RSSD {
+namespace System {
 
 ///
 /// Includes
@@ -123,8 +123,8 @@ boost::system::error_condition make_error_condition(filesystem_error::value e)
         filesystem_category());
 }
 
-} // namespace system
-} // namespace rssd
+} // namespace System
+} // namespace RSSD
 
 ///
 /// @note Step 7: register for implicit conversion to error_code

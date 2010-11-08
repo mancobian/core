@@ -33,12 +33,12 @@
 #ifndef RSSD_CORE_SYSTEM_PREPROCESS_H
 #define RSSD_CORE_SYSTEM_PREPROCESS_H
 
-namespace rssd {
-namespace system {
+namespace RSSD {
+namespace System {
 
 #define FATAL(MESSAGE) __FILE__ (__LINE__): MESSAGE
 
-}  // namespace system
-}  // namespace rssd
+}  // namespace System
+}  // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_PREPROCESS_H

@@ -44,10 +44,10 @@
 #ifndef RSSD_CORE_PATTERNS_SINGLETON_H
 #define RSSD_CORE_PATTERNS_SINGLETON_H
 
-#include "../System.h"
+#include "System"
 
-namespace rssd {
-namespace pattern {
+namespace RSSD {
+namespace Pattern {
 
 template<typename T>
 class Singleton
@@ -79,9 +79,9 @@ class Singleton
 ///
 
 #define DECLARE_SINGLETON(TYPENAME) \
-template<> TYPENAME* rssd::pattern::Singleton<TYPENAME>::_instance = NULL;
+template<> TYPENAME* rssd::Pattern::Singleton<TYPENAME>::_instance = NULL;
 
-} // namespace pattern
-} // namespace rssd
+} // namespace Pattern
+} // namespace RSSD
 
 #endif /* RSSD_CORE_PATTERNS_SINGLETON_H */

@@ -33,8 +33,10 @@
 #ifndef RSSD_CORE_CORE
 #define RSSD_CORE_CORE
 
-#include "system.h"
-#include "filesystem.h"
-#include "pattern.h"
+#include "System"
+#include "Filesystem"
+#include "Pattern"
+#include "Timer"
+#include "Input"
 
 #endif // RSSD_CORE_CORE

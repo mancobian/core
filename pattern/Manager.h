@@ -33,10 +33,10 @@
 #ifndef RSSD_CORE_PATTERN_MANAGER_H
 #define RSSD_CORE_PATTERN_MANAGER_H
 
-#include "../System.h"
+#include "System"
 
-namespace rssd {
-namespace pattern {
+namespace RSSD {
+namespace Pattern {
 
 ///
 /// @todo Rethink memory ownership of Manager-derived objects.
@@ -100,7 +100,7 @@ class Manager<ITEM*>
 
 #include "Manager-inl.h"
 
-} // namespace pattern
-} // namespace rssd
+} // namespace Pattern
+} // namespace RSSD
 
 #endif // RSSD_CORE_PATTERN_MANAGER_H

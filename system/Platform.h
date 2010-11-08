@@ -33,12 +33,12 @@
 #ifndef RSSD_CORE_SYSTEM_PLATFORM_H
 #define RSSD_CORE_SYSTEM_PLATFORM_H
 
-namespace rssd {
-namespace system {
+namespace RSSD {
+namespace System {
 
 struct Platform
 {
-	enum Type
+	enum Types
   {
     UNKNOWN = 0,
 		POSIX = 1<<0,
@@ -51,13 +51,14 @@ struct Platform
 	}; // enum Type
 }; // struct Platform
 
-#if !defined(RSSD_PLATFORM_LINUX) && \
+#if !defined(RSSD_PLATFORM_POSIX) && \
+  !defined(RSSD_PLATFORM_LINUX) && \
 	!defined(RSSD_PLATFORM_OSX) && \
 	!defined(RSSD_PLATFORM_WINDOWS)
 // #error FATAL("Detected an unsupported platform.")
 #endif
 
-} // namespace system
-} // namespace rssd
+} // namespace System
+} // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_PLATFORM_H
