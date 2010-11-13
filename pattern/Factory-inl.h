@@ -1,135 +1,136 @@
 ///
-/// @class FactoryManager
+/// @class Factory<>::Manager
 ///
 
-template <typename PRODUCT>
-FactoryManager<PRODUCT>::FactoryManager() :
-	_id(1)
+template <typename T> uint32_t Factory<T>::Manager::FACTORY_ID = 1;
+
+template <typename T>
+Factory<T>::Manager::Manager()
 {
 }
 
-template <typename PRODUCT>
-FactoryManager<PRODUCT>::~FactoryManager()
+template <typename T>
+Factory<T>::Manager::~Manager()
 {
 }
 
-template <typename PRODUCT>
-uint32_t FactoryManager<PRODUCT>::generateFactoryId()
+template <typename T>
+uint32_t Factory<T>::Manager::generateFactoryId()
 {
-	return this->_id++;
+	return Factory<T>::Manager::FACTORY_ID++;
 }
 
-template <typename PRODUCT>
-bool FactoryManager<PRODUCT>::hasFactory(const uint32_t type)
+template <typename T>
+bool Factory<T>::Manager::hasFactory(const uint32_t type)
 {
-	if (this->_factories.find(type) == this->_factories.end())
+	if (this->mFactories.find(type) == this->mFactories.end())
 		return false;
 	return true;
 }
 
-template <typename PRODUCT>
-bool FactoryManager<PRODUCT>::hasProduct(const PRODUCT *product)
+template <typename T>
+Factory<T>* Factory<T>::Manager::getFactory(const uint32_t type)
 {
-	if (this->_products.find(const_cast<PRODUCT*>(product)) == this->_products.end())
-		return false;
-	return true;
+  typename FactoryMap::iterator iter = this->mFactories.find(type);
+  if (iter == this->mFactories.end())
+    return NULL;
+  return iter->second;
 }
 
-template <typename PRODUCT>
-bool FactoryManager<PRODUCT>::registerFactory(Factory<PRODUCT> *factory)
+template <typename T>
+bool Factory<T>::Manager::registerFactory(Factory<T> *factory)
 {
 	if (this->hasFactory(factory->getType()))
 		return false;
-	this->_factories.insert(std::make_pair(factory->getType(), factory));
+	this->mFactories.insert(std::make_pair(factory->getType(), factory));
 	return true;
 }
 
-template <typename PRODUCT>
-Factory<PRODUCT>* FactoryManager<PRODUCT>::unregisterFactory(const uint32_t type)
+template <typename T>
+Factory<T>* Factory<T>::Manager::unregisterFactory(const uint32_t type)
 {
-	Factory<PRODUCT> *factory = NULL;
+	Factory<T> *factory = NULL;
 	if (this->hasFactory(type))
 	{
-		typename FactoryManager<PRODUCT>::Factory_m::iterator iter = this->_factories.find(type);
+		typename FactoryMap::iterator iter = this->mFactories.find(type);
 		factory = iter->second;
-		this->_factories.erase(iter);
+		this->mFactories.erase(iter);
 	}
 	return factory;
 }
 
-template <typename PRODUCT>
-PRODUCT* FactoryManager<PRODUCT>::create(const uint32_t type)
-{
-	if (!this->hasFactory(type))
-		return NULL;
-	PRODUCT *product = this->_factories[type]->create();
-	this->_products.insert(std::make_pair(product, type));
-	return product;
-}
-
-template <typename PRODUCT>
-bool FactoryManager<PRODUCT>::destroy(PRODUCT *product)
-{
-	if (!this->hasProduct(product))
-		return false;
-	typename FactoryManager<PRODUCT>::Product_m::iterator iter = this->_products.find(product);
-	uint32_t type = iter->second;
-	this->_products.erase(iter);
-	if (!this->hasFactory(type))
-		return false;
-	this->_factories[type]->destroy(product);
-	return true;
-}
-
 ///
-/// @class Factory
+/// @class Factory<>
 ///
 
-template <typename PRODUCT>
-Factory<PRODUCT>::Factory() // : _type(FactoryManager<PRODUCT>::getPointer()->generateFactoryId())
+template <typename T>
+Factory<T>::Factory()
 {
 }
 
-template <typename PRODUCT>
-Factory<PRODUCT>::~Factory()
+template <typename T>
+Factory<T>::~Factory()
 {
-	Pattern::Manager<PRODUCT*>::clear();
 }
 
-template <typename PRODUCT>
-bool Factory<PRODUCT>::operator ==(const uint32_t &value) const
+template <typename T>
+bool Factory<T>::operator ==(const uint32_t &value) const
 {
 	return (this->getType() == value);
 }
 
-template <typename PRODUCT>
-bool Factory<PRODUCT>::operator <(const uint32_t &value) const
+template <typename T>
+bool Factory<T>::operator <(const uint32_t &value) const
 {
 	return (this->getType() < value);
 }
 
-template <typename PRODUCT>
-bool Factory<PRODUCT>::operator ==(const Factory &value) const
+template <typename T>
+bool Factory<T>::operator ==(const Factory &value) const
 {
 	return this->operator ==(value.getType());
 }
 
-template <typename PRODUCT>
-bool Factory<PRODUCT>::operator <(const Factory &value) const
+template <typename T>
+bool Factory<T>::operator <(const Factory &value) const
 {
 	return this->operator <(value.getType());
 }
 
-template <typename PRODUCT>
-PRODUCT* Factory<PRODUCT>::create()
+///
+/// @class Factory<>::Impl<>
+///
+
+template <typename T>
+template <typename U>
+const uint32_t Factory<T>::Impl<U>::TYPE = Factory<T>::Manager::generateFactoryId();
+
+template <typename T>
+template <typename U>
+Factory<T>::Impl<U>::Impl() :
+  Pattern::Manager<U*>()
 {
-	PRODUCT *product = this->createImpl();
-	this->add(product);
-	return product;
 }
 
-template <typename PRODUCT>
-void Factory<PRODUCT>::destroy(PRODUCT *product)
+template <typename T>
+template <typename U>
+Factory<T>::Impl<U>::~Impl()
 {
-	this->remove(product);
+}
+
+template <typename T>
+template <typename U>
+T* Factory<T>::Impl<U>::create()
+{
+	T *value = this->createImpl();
+	this->add(value);
+	return value;
+}
+
+template <typename T>
+template <typename U>
+void Factory<T>::Impl<U>::destroy(T *value)
+{
+	this->remove(value);
+	delete value;
 }

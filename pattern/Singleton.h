@@ -79,7 +79,7 @@ class Singleton
 ///
 
 #define DECLARE_SINGLETON(TYPENAME) \
-template<> TYPENAME* rssd::Pattern::Singleton<TYPENAME>::_instance = NULL;
+template<> TYPENAME* RSSD::Pattern::Singleton<TYPENAME>::_instance = NULL;
 
 } // namespace Pattern
 } // namespace RSSD

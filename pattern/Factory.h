@@ -40,63 +40,58 @@
 namespace RSSD {
 namespace Pattern {
 
-template <typename PRODUCT>
-class Factory :
-  virtual public Manager<PRODUCT*>,
-  public boost::noncopyable
+/// @note The base Factory<> class will never exist.
+///   This pattern only provides for a Manager class
+///   that will manage a collection of Factory<>::Impl<>
+///   types.
+template <typename T>
+class Factory
 {
 public:
-  typedef PRODUCT Product;
+  template <typename U>
+  class Impl : public Pattern::Manager<T*>
+  {
+  public:
+    Impl();
+    virtual ~Impl();
+    static uint32_t getType() { return TYPE; }
+    virtual T* create();
+    virtual void destroy(T *value);
 
-public:
+  protected:
+    virtual T* createImpl() = 0;
+
+    static const uint32_t TYPE;
+  }; /// class Impl
+
+  class Manager : public Pattern::Manager<Factory<T>*>
+  {
+  public:
+    typedef typename std::map<uint32_t, Factory<T>*> FactoryMap;
+
+    Manager();
+    virtual ~Manager();
+    virtual bool hasFactory(const uint32_t type);
+    virtual Factory<T>* getFactory(const uint32_t type);
+    virtual bool registerFactory(Factory<T> *factory);
+    virtual Factory<T>* unregisterFactory(const uint32_t type);
+    static uint32_t generateFactoryId();
+
+  protected:
+    static uint32_t FACTORY_ID;
+    FactoryMap mFactories;
+  }; // class Manager
+
   Factory();
   virtual ~Factory();
-
-public:
-  virtual uint32_t getType() const = 0; // { return this->_type; }
-
-public:
   bool operator ==(const uint32_t &value) const;
   bool operator <(const uint32_t &value) const;
   bool operator ==(const Factory &value) const;
   bool operator <(const Factory &value) const;
-
-public:
-  virtual PRODUCT* create();
-  virtual void destroy(PRODUCT *product);
-
-protected:
-  virtual PRODUCT* createImpl() = 0;
-
-protected:
-  uint32_t _type;
+  virtual uint32_t getType() const = 0;
+  virtual T* create() = 0;
+  virtual void destroy(T *value) = 0;
 }; // class Factory
-
-template <typename PRODUCT>
-class FactoryManager : virtual public Manager<Factory<PRODUCT>*>
-{
-public:
-  typedef typename std::map<uint32_t, Factory<PRODUCT>*> Factory_m;
-  typedef std::map<PRODUCT*, uint32_t> Product_m;
-
-public:
-  FactoryManager();
-  virtual ~FactoryManager();
-
-public:
-  virtual bool hasFactory(const uint32_t type);
-  virtual bool hasProduct(const PRODUCT *product);
-  virtual bool registerFactory(Factory<PRODUCT> *factory);
-  virtual Factory<PRODUCT>* unregisterFactory(const uint32_t type);
-  virtual PRODUCT* create(const uint32_t type);
-  virtual bool destroy(PRODUCT *product);
-  virtual uint32_t generateFactoryId();
-
-protected:
-  uint32_t _id;
-  Factory_m _factories;
-  Product_m _products;
-}; // class FactoryManager
 
 #include "Factory-inl.h"
 

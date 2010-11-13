@@ -44,7 +44,7 @@ namespace Pattern {
 /// @todo Add MappedManager implementations for key-value pairs of managed items.
 ///
 template <typename ITEM>
-class Manager
+class Manager : public boost::noncopyable
 {
 	public:
 		typedef ITEM Item;
@@ -75,7 +75,7 @@ class Manager
 /// @todo Claim ownership of memory
 /// and store pointers as shared pointers...
 template <typename ITEM>
-class Manager<ITEM*>
+class Manager<ITEM*> : public boost::noncopyable
 {
 	public:
 		typedef ITEM Item;
