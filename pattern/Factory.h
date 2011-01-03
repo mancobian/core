@@ -38,6 +38,7 @@
 #include "Singleton.h"
 
 namespace RSSD {
+namespace Core {
 namespace Pattern {
 
 /// @note The base Factory<> class will never exist.
@@ -49,36 +50,41 @@ class Factory
 {
 public:
   template <typename U>
-  class Impl : public Pattern::Manager<T*>
+  class Impl :
+    public Pattern::Singleton<Factory<T>::Impl<U> >,
+    public Pattern::Factory<T>,
+    public Pattern::Manager<T*>
   {
   public:
     Impl();
     virtual ~Impl();
-    static uint32_t getType() { return TYPE; }
+    static uint_t getType() { return Impl<U>::TYPE; }
     virtual T* create();
     virtual void destroy(T *value);
 
-  protected:
-    virtual T* createImpl() = 0;
+    static const uint_t TYPE;
 
-    static const uint32_t TYPE;
+  protected:
+    virtual T* createImpl() const { return new U(); }
   }; /// class Impl
 
-  class Manager : public Pattern::Manager<Factory<T>*>
+  class Manager :
+    public Pattern::Singleton<Factory<T>::Manager>,
+    public Pattern::Manager<Factory<T>*>
   {
   public:
-    typedef typename std::map<uint32_t, Factory<T>*> FactoryMap;
+    typedef typename std::map<uint_t, Factory<T>*> FactoryMap;
 
     Manager();
-    virtual ~Manager();
-    virtual bool hasFactory(const uint32_t type);
-    virtual Factory<T>* getFactory(const uint32_t type);
-    virtual bool registerFactory(Factory<T> *factory);
-    virtual Factory<T>* unregisterFactory(const uint32_t type);
-    static uint32_t generateFactoryId();
+    ~Manager();
+    bool hasFactory(const uint_t type);
+    Factory<T>* getFactory(const uint_t type);
+    bool registerFactory(Factory<T> *factory);
+    Factory<T>* unregisterFactory(const uint_t type);
+    static const uint_t generateFactoryId();
 
   protected:
-    static uint32_t FACTORY_ID;
+    static uint_t FACTORY_ID; /// @note First valid ID starts at 1.
     FactoryMap mFactories;
   }; // class Manager
 
@@ -88,7 +94,6 @@ public:
   bool operator <(const uint32_t &value) const;
   bool operator ==(const Factory &value) const;
   bool operator <(const Factory &value) const;
-  virtual uint32_t getType() const = 0;
   virtual T* create() = 0;
   virtual void destroy(T *value) = 0;
 }; // class Factory
@@ -96,6 +101,7 @@ public:
 #include "Factory-inl.h"
 
 } // namespace Pattern
+} // namespace Core
 } // namespace RSSD
 
 #endif // RSSD_CORE_PATTERN_FACTORY_H

@@ -30,8 +30,8 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_LOG_H
-#define RSSD_LOG_H
+#ifndef RSSD_CORE_LOG_H
+#define RSSD_CORE_LOG_H
 
 #include <cstdarg>
 #include <ostream>
@@ -43,19 +43,20 @@
 #include "Pattern"
 
 namespace RSSD {
+namespace Core {
 
 class Loggable
 {
 public:
-	Loggable(const std::string &log_group = "") : _log_group(log_group) {}
+	Loggable(const string_t &log_group = "") : _log_group(log_group) {}
 	virtual ~Loggable() {}
 
 public:
-	virtual inline const std::string& getLogGroup() const { return this->_log_group; }
-	virtual inline void setLogGroup(const std::string &value) { this->_log_group = value; }
+	virtual inline const string_t& getLogGroup() const { return this->_log_group; }
+	virtual inline void setLogGroup(const string_t &value) { this->_log_group = value; }
 
 protected:
-	std::string _log_group;
+	string_t _log_group;
 }; // class Loggable
 
 class Log
@@ -79,11 +80,11 @@ public:
 public:
 	struct Entry
 	{
-		std::string File;
+		string_t File;
 		size_t Line;
 		Log::Level::Type Level;
-		std::string Group;
-		std::string Message;
+		string_t Group;
+		string_t Message;
 	}; // struct Entry
 	TYPEDEF_CONTAINERS(Entry)
 
@@ -91,47 +92,47 @@ public:
 	typedef std::map<Log::Level::Type, const char*> LevelDescription_m;
 
 public:
-	static std::string getPrefix(const Log::Entry &entry);
-	static std::string getTimestamp();
+	static string_t getPrefix(const Log::Entry &entry);
+	static string_t getTimestamp();
 
 public:
 	static const char *DEFAULT_GROUP;
-	static const std::string FORMAT_STRING;
+	static const string_t FORMAT_STRING;
 	static LevelDescription_m LEVEL_DESCRIPTIONS;
 
 public:
-	Log(const std::string &name);
-	Log(const std::string &name, std::streambuf *buffer);
+	Log(const string_t &name);
+	Log(const string_t &name, std::streambuf *buffer);
 	virtual ~Log();
 
 public:
-	inline const std::string& getName() const { return this->_name; }
+	inline const string_t& getName() const { return this->_name; }
 	inline std::ostream* getStream() { return this->_stream; }
 	inline const Log::Level::Type getLevel() const { return this->_level; }
 	inline void setLevel(const Log::Level::Type value) { this->_level = value; }
 
 public:
-	bool operator ==(const std::string &name);
+	bool operator ==(const string_t &name);
 	bool operator ==(const std::streambuf *buffer);
 	bool operator ==(const Log &log);
 
 public:
 	void log(const Entry &entry);
-	void log(const std::string &message,
-		const std::string &file = "",
+	void log(const string_t &message,
+		const string_t &file = "",
 		const size_t line = 0,
-		const std::string &group = Log::DEFAULT_GROUP,
+		const string_t &group = Log::DEFAULT_GROUP,
 		const Level::Type level = Log::Level::NORMAL);
 	void log(const std::stringstream &message,
-		const std::string &file = "",
+		const string_t &file = "",
 		const size_t line = 0,
-		const std::string &group = Log::DEFAULT_GROUP,
+		const string_t &group = Log::DEFAULT_GROUP,
 		const Level::Type level = Log::Level::NORMAL);
 
 protected:
 	bool _is_file;
 	Log::Level::Type _level;
-	std::string _name;
+	string_t _name;
 	std::ostream *_stream;
 	boost::mutex _mutex;
 }; // class Log
@@ -142,14 +143,14 @@ class LogManager :
 {
 public:
 	typedef Pattern::Manager<Log*> BaseManager;
-	typedef BaseManager::Item_l Log_l;
+	typedef BaseManager::ItemList Log_l;
 
 public:
 	static const char DEFAULT_NLOG_NAME[];
 
 public:
 	LogManager();
-	LogManager(const std::string &name);
+	LogManager(const string_t &name);
 	~LogManager();
 
 public:
@@ -158,28 +159,28 @@ public:
 	bool setDefaultLog(const Log *log);
 	void setLogLevel(const Log::Level::Type value);
 	bool hasLog(const std::streambuf *buffer);
-	bool hasLog(const std::string &name);
+	bool hasLog(const string_t &name);
 	bool hasLog(const Log *log);
 	Log* getLog(const std::streambuf *buffer);
-	Log* getLog(const std::string &name);
+	Log* getLog(const string_t &name);
 
 public:
-	Log* createLog(const std::string &name,
+	Log* createLog(const string_t &name,
 		bool is_default = false);
-	Log* createLog(const std::string &name,
+	Log* createLog(const string_t &name,
 		std::streambuf *buffer,
 		bool is_default = false);
-	bool destroyLog(const std::string &name);
+	bool destroyLog(const string_t &name);
 	bool destroyLog(Log *log);
 	void destroyAllLogs();
 
 public:
-	void log(const std::string &message,
-		const std::string &file,
+	void log(const string_t &message,
+		const string_t &file,
 		const size_t line,
 		...);
 	void log(const std::stringstream &message,
-		const std::string &file,
+		const string_t &file,
 		const size_t line,
 		...);
 
@@ -203,9 +204,10 @@ protected:
 { \
 	std::stringstream ss; \
 	ss << __MESSAGE; \
-	RSSD::LogManager::getPointer()->log(ss, __FILE__, __LINE__, ##__VA_ARGS__, (void*)NULL); \
+	RSSD::Core::LogManager::getPointer()->log(ss, __FILE__, __LINE__, ##__VA_ARGS__, (void*)NULL); \
 }
 
+} // namespace Core
 } // namespace RSSD
 
-#endif // RSSD_LOG_H
+#endif // RSSD_CORE_LOG_H

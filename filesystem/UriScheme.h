@@ -54,12 +54,12 @@ public:
   }; // enum Schemes
 
 public:
-  typedef std::map<std::string, UriScheme::Types> SchemeMap;
+  typedef std::map<RSSD::string_t, UriScheme::Types> SchemeMap;
 
 public:
   static const char getTypeDelimiter() { return ':'; }
 
-  static UriScheme::Types toInt(const std::string &type)
+  static UriScheme::Types toInt(const RSSD::string_t &type)
   {
     UriScheme::SchemeMap &scheme_map = UriScheme::getSchemeMap();
     UriScheme::SchemeMap::const_iterator iter = scheme_map.find(type);
@@ -68,12 +68,12 @@ public:
     return iter->second;
   }
 
-  static UriScheme::Types getType(const std::string &uri)
+  static UriScheme::Types getType(const RSSD::string_t &uri)
   {
     // Validate input as URI-type string
-    std::string uri_copy(uri);
+    RSSD::string_t uri_copy(uri);
     size_t index = uri_copy.find_first_of(UriScheme::getTypeDelimiter());
-    if (index == std::string::npos)
+    if (index == RSSD::string_t::npos)
       return UriScheme::UNKNOWN;
 
     // Sanitize input string (in-place)
@@ -81,7 +81,7 @@ public:
     boost::algorithm::trim(uri_copy);
 
     // Parse scheme type
-    std::string type = uri_copy.substr(0, index);
+    RSSD::string_t type = uri_copy.substr(0, index);
 
     // Convert to integer type
     return UriScheme::toInt(type);

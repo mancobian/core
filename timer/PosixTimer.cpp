@@ -1,22 +1,14 @@
 #include "PosixTimer.h"
 
 using namespace RSSD;
-
-//!
-// @class PosixTimerFactory
-///
-
-template<> PosixTimerFactory* Pattern::Singleton<PosixTimerFactory>::_instance = NULL;
-
-TimerFactory::Product* PosixTimerFactory::createImpl()
-{
-	return new PosixTimer();
-}
+using namespace RSSD::Core;
 
 //!
 // @class PosixTimer
 // @todo Add errno error checking for each system call
 ///
+
+DECLARE_SINGLETON(RSSD::Core::PosixTimer::Factory);
 
 PosixTimer::PosixTimer()
 {

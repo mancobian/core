@@ -1,0 +1,52 @@
+package Nous;
+
+message Configuration {
+	message Ogre {
+		message Video {
+			enum RenderToTextureMode {
+				FBO = 0;
+				PBUFFER = 1;
+			} // enum RTTMode
+			
+			required string render_system = 1 [default = "OpenGL Rendering Subsystem"];
+			required uint32 frequency = 2 [default = 50];
+			optional uint32 antialiasing = 3 [default = 0];
+			optional bool fullscreen = 4 [default = false];
+			optional RenderToTextureMode rtt_mode = 5 [default = FBO];
+			optional bool vsync = 6 [default = false];
+			optional uint32 width = 7 [default = 800];
+			optional uint32 height = 8 [default = 600];
+			optional bool srgb_gamma_conversion = 9 [default = false]; 
+		} // message Video
+		
+		message Resource {
+			enum Type {
+				FILESYSTEM = 0;
+				ZIP = 1;
+				CUSTOM = 2;
+			}
+			required Type type = 1;
+			required string path = 2;
+		}
+		
+		message ResourceGroup {
+			required string name = 1;
+			repeated Resource resource = 2;
+		}
+		
+		message Resources {
+			repeated ResourceGroup group = 1;
+		}
+		
+		message Plugins {
+			repeated string path = 1; // [default = "/usr/lib/OGRE"]
+			repeated string name = 2;
+		} // message Plugins
+	
+		required Video video = 1;
+		optional Resources resources = 2;
+		optional Plugins plugins = 3;
+	} // message Ogre
+	
+	optional Ogre ogre = 1;
+} // message Configuration

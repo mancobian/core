@@ -1,6 +1,7 @@
 #include "Strid.h"
 
 using namespace RSSD;
+using namespace RSSD::Core;
 
 boost::mutex Strid::HASHMUTEX;
 Strid::id_s Strid::HASHSET;
@@ -31,7 +32,7 @@ Strid::~Strid()
 {
 }
 
-uint32_t Strid::getHash(const std::string &text)
+uint32_t Strid::getHash(const string_t &text)
 {
   // Concurrency lock
   boost::mutex::scoped_lock lock(Strid::HASHMUTEX);

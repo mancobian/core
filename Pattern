@@ -30,8 +30,8 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_PATTERN_H
-#define RSSD_PATTERN_H
+#ifndef RSSD_CORE_PATTERN_H
+#define RSSD_CORE_PATTERN_H
 
 #include "pattern/Factory.h"
 #include "pattern/Manager.h"
@@ -39,4 +39,4 @@
 #include "pattern/Singleton.h"
 // #include "pattern/StateMachine.h"
 
-#endif // RSSD_PATTERN_H
+#endif // RSSD_CORE_PATTERN_H

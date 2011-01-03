@@ -30,69 +30,47 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef NOUS_TIMER_TIMER_H
-#define NOUS_TIMER_TIMER_H
+#ifndef NOUS_CORE_TIMER_TIMER_H
+#define NOUS_CORE_TIMER_TIMER_H
 
 #include "System"
 #include "Pattern"
 
 namespace RSSD {
+namespace Core {
 
 class Timer
 {
-	public:
-		static const uint64_t USEC_PER_SEC = 1000000;
-		static const uint64_t USEC_PER_MSEC = 1000;
+public:
+  typedef Pattern::Factory<Timer> Factory;
+  typedef Factory::Manager Manager;
 
-	public:
-		Timer();
-		virtual ~Timer();
+  Timer() {}
+  virtual ~Timer() {}
+  virtual void start() = 0;
+  virtual void stop() = 0;
+  virtual void reset() = 0;
+  /// @note Elapsed time in integer microseconds
+  /// @note 2^64 useconds = ~584554.431 years
+  virtual uint64_t getMicroseconds() const = 0;
 
-	public:
-		virtual void start() = 0;
-		virtual void stop() = 0;
-		virtual void reset() = 0;
-		/// @note Elapsed time in integer microseconds
-		/// @note 2^64 useconds = ~584554.431 years
-		virtual uint64_t getMicroseconds() const = 0;
+  inline virtual float64_t getMilliseconds() const
+  {
+    return static_cast<float64_t>(this->getMicroseconds())
+      / static_cast<float64_t>(USEC_PER_MSEC);
+  }
 
-	public:
-		virtual float64_t getMilliseconds() const
-		{
-			return static_cast<float64_t>(this->getMicroseconds())
-				/ static_cast<float64_t>(USEC_PER_MSEC);
-		}
+  inline virtual float64_t getSeconds() const
+  {
+    return static_cast<float64_t>(this->getMicroseconds())
+      / static_cast<float64_t>(USEC_PER_SEC);
+  }
 
-		virtual float64_t getSeconds() const
-		{
-			return static_cast<float64_t>(this->getMicroseconds())
-				/ static_cast<float64_t>(USEC_PER_SEC);
-		}
+  static const uint64_t USEC_PER_SEC = 1000000;
+  static const uint64_t USEC_PER_MSEC = 1000;
 }; // class Timer
 
-typedef Pattern::Factory<Timer> TimerFactory;
-
-class TimerManager :
-	public Pattern::Singleton<TimerManager>,
-	public Pattern::Manager<TimerFactory*>
-{
-	public:
-		typedef Pattern::Manager<TimerFactory*> Manager_t;
-		typedef Manager_t::Item_l TimerFactory_l;
-
-	public:
-		TimerManager();
-		virtual ~TimerManager();
-
-	public:
-		TimerFactory* find(const uint32_t &type);
-		Timer* createTimer(const System::Platform::Types type = System::Platform::UNKNOWN);
-
-	protected:
-		void createFactories();
-		void destroyFactories();
-}; // class TimerManager
-
+} // namespace Core
 } // namespace RSSD
 
-#endif // NOUS_TIMER_TIMER_H
+#endif // RSSD_CORE_TIMER_TIMER_H

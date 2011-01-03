@@ -36,28 +36,53 @@
 #include "System"
 
 namespace RSSD {
+namespace Core {
 namespace Pattern {
+
+///
+/// @plan Use raw pointers if you intend for a MANAGER
+///   derived object to manage memory de-allocation.
+///   Otherwise, if you would like a MANAGER to maintain
+///   a collection of pointers but NOT to manage the
+///   de-allocation of the referenced memory, use a weak
+///   pointer object to wrap your pointers, such as
+///   boost::weak_ptr or std::tr1::weak_ptr.
+///
+///   Weak pointer wrappers will cause submitted items
+///   to be viewed a value types, which will be managed
+///   by the value type manager:
+///     - template <typename ITEM> Manager
+///   instead of the reference type manager:
+///     - template <typename ITEM*> Manager
+///
+///   An example of this can be seen in Pattern::Publisher,
+///   which is a manager of Subscriber objects but should
+///   not be responsible for their memory management, e.g. de-allocation.
+///
 
 ///
 /// @todo Rethink memory ownership of Manager-derived objects.
 /// @todo Add a template specialization for shared_ptr items.
 /// @todo Add MappedManager implementations for key-value pairs of managed items.
+/// @todo Consider how C++ Traits may be used to reduce code duplication between
+///   Manager class template specializations.
 ///
 template <typename ITEM>
 class Manager : public boost::noncopyable
 {
 	public:
 		typedef ITEM Item;
-		typedef typename std::list<Item> Item_l;
-		typedef typename Item_l::iterator Handle;
+		typedef typename std::list<Item> ItemList;
+		typedef typename ItemList::iterator Handle;
+		typedef std::tr1::shared_ptr<Manager<ITEM> > Pointer;
 
 	public:
 		Manager();
 		virtual ~Manager();
 
 	public:
-		virtual inline Item_l& getItems() { return this->_items; }
-		virtual inline const Item_l& getItems() const { return this->_items; }
+		virtual inline ItemList& getItems() { return this->_items; }
+		virtual inline const ItemList& getItems() const { return this->_items; }
 
 	public:
 		virtual Handle get(const ITEM &item);
@@ -68,39 +93,67 @@ class Manager : public boost::noncopyable
 		virtual void clear();
 
 	protected:
-		Item_l _items;
+		ItemList _items;
 }; // class Manager
 
+template <typename ITEM>
+class Manager<std::tr1::weak_ptr<ITEM> > : public boost::noncopyable
+{
+public:
+  typedef std::tr1::weak_ptr<ITEM> Item;
+  typedef typename std::list<Item> ItemList;
+  typedef typename ItemList::iterator Handle;
+  typedef std::tr1::shared_ptr<Manager<Item> > Pointer;
 
-/// @todo Claim ownership of memory
-/// and store pointers as shared pointers...
+public:
+  Manager();
+  virtual ~Manager();
+
+public:
+  virtual inline ItemList& getItems() { return this->_items; }
+  virtual inline const ItemList& getItems() const { return this->_items; }
+
+public:
+  virtual Handle get(const Item &item);
+  virtual bool has(const Item &item);
+  virtual uint32_t size() const;
+  virtual bool add(Item item);
+  virtual bool remove(Item item);
+  virtual void clear();
+
+protected:
+  ItemList _items;
+};
+
 template <typename ITEM>
 class Manager<ITEM*> : public boost::noncopyable
 {
-	public:
-		typedef ITEM Item;
-		typedef typename std::list<Item*> Item_l;
-		typedef typename Item_l::iterator Handle;
+public:
+  typedef ITEM Item;
+  typedef typename std::list<Item*> ItemList;
+  typedef typename ItemList::iterator Handle;
+  typedef std::tr1::shared_ptr<Manager<ITEM*> > Pointer;
 
-	public:
-		Manager();
-		virtual ~Manager();
+public:
+  Manager();
+  virtual ~Manager();
 
-	public:
-		virtual Handle get(const ITEM *item);
-		virtual bool has(const ITEM *item);
-		virtual uint32_t size() const;
-		virtual bool add(ITEM *item);
-		virtual bool remove(ITEM *item);
-		virtual void clear();
+public:
+  virtual Handle get(const Item *item);
+  virtual bool has(const Item *item);
+  virtual uint32_t size() const;
+  virtual bool add(Item *item);
+  virtual bool remove(Item *item);
+  virtual void clear();
 
-	protected:
-		Item_l _items;
+protected:
+  ItemList _items;
 }; // class Manager
 
 #include "Manager-inl.h"
 
 } // namespace Pattern
+} // namespace Core
 } // namespace RSSD
 
 #endif // RSSD_CORE_PATTERN_MANAGER_H

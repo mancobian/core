@@ -2,7 +2,8 @@
 /// @class Factory<>::Manager
 ///
 
-template <typename T> uint32_t Factory<T>::Manager::FACTORY_ID = 1;
+template <typename T>
+uint32_t Factory<T>::Manager::FACTORY_ID = 0;
 
 template <typename T>
 Factory<T>::Manager::Manager()
@@ -15,9 +16,9 @@ Factory<T>::Manager::~Manager()
 }
 
 template <typename T>
-uint32_t Factory<T>::Manager::generateFactoryId()
+const uint_t Factory<T>::Manager::generateFactoryId()
 {
-	return Factory<T>::Manager::FACTORY_ID++;
+	return ++Factory<T>::Manager::FACTORY_ID;
 }
 
 template <typename T>
@@ -103,19 +104,23 @@ bool Factory<T>::operator <(const Factory &value) const
 
 template <typename T>
 template <typename U>
-const uint32_t Factory<T>::Impl<U>::TYPE = Factory<T>::Manager::generateFactoryId();
+const uint_t Factory<T>::Impl<U>::TYPE = Factory<T>::Manager::generateFactoryId();
 
 template <typename T>
 template <typename U>
 Factory<T>::Impl<U>::Impl() :
   Pattern::Manager<U*>()
 {
+  /// Register factory on creation
+  Factory<T>::Manager::getPointer()->registerFactory(this);
 }
 
 template <typename T>
 template <typename U>
 Factory<T>::Impl<U>::~Impl()
 {
+  /// Register factory on destruction
+  Factory<T>::Manager::getPointer()->unregisterFactory(this->getType());
 }
 
 template <typename T>

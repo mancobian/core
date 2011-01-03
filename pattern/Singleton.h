@@ -41,12 +41,13 @@
 /// "Portions Copyright (C) Scott Bilas, 2000"
 ///
 
-#ifndef RSSD_CORE_PATTERNS_SINGLETON_H
-#define RSSD_CORE_PATTERNS_SINGLETON_H
+#ifndef RSSD_CORE_PATTERN_SINGLETON_H
+#define RSSD_CORE_PATTERN_SINGLETON_H
 
 #include "System"
 
 namespace RSSD {
+namespace Core {
 namespace Pattern {
 
 template<typename T>
@@ -79,9 +80,10 @@ class Singleton
 ///
 
 #define DECLARE_SINGLETON(TYPENAME) \
-template<> TYPENAME* RSSD::Pattern::Singleton<TYPENAME>::_instance = NULL;
+template<> TYPENAME* RSSD::Core::Pattern::Singleton<TYPENAME>::_instance = NULL;
 
 } // namespace Pattern
+} // namespace Core
 } // namespace RSSD
 
-#endif /* RSSD_CORE_PATTERNS_SINGLETON_H */
+#endif /// RSSD_CORE_PATTERN_SINGLETON_H

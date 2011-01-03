@@ -80,7 +80,7 @@ public:
     }
 
     /// @note Step 4: convert error codes to strings
-    inline virtual std::string message(int ev) const
+    inline virtual string_t message(int ev) const
     {
         switch (ev)
         {

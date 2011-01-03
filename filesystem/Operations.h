@@ -98,7 +98,7 @@ template<class Path> const char* dotdot<Path>::value = "..";
 BOOST_FS_FUNC(bool)
 is_hidden(const Path &target_path)
 {
-  std::string filename = target_path.filename();
+  RSSD::string_t filename = target_path.filename();
   if (!filename.empty() && filename[0] == '.')
     return true;
   return false;

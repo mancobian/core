@@ -30,18 +30,30 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_INPUTMANAGER_H
-#define RSSD_INPUTMANAGER_H
+#ifndef RSSD_CORE_INPUT_INPUTMANAGER_H
+#define RSSD_CORE_INPUT_INPUTMANAGER_H
+
+#include "Pattern"
+#include "input/Device.h"
 
 namespace RSSD {
+namespace Core {
+namespace Input {
 
-class InputManager
+class IInputManager : public Pattern::Manager<Device*>
 {
 public:
-  InputManager();
-  virtual ~InputManager();
+  typedef Pattern::Manager<Device*> Manager;
+
+  IInputManager() : Pattern::Manager<Device*>() {}
+  virtual ~IInputManager() {}
+  virtual Device* createDevice(const uint_t type) = 0;
+  virtual bool destroyDevice(Device *device) = 0;
+  virtual bool update(const float_t elapsed) = 0;
 }; /// class InputManager
 
+} /// namespace Input
+} /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_INPUTMANAGER_H
+#endif // RSSD_CORE_INPUT_INPUTMANAGER_H

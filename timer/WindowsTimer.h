@@ -30,41 +30,29 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_WINDOWSTIMER_H
-#define RSSD_WINDOWSTIMER_H
+#ifndef RSSD_CORE_TIMER_WINDOWSTIMER_H
+#define RSSD_CORE_TIMER_WINDOWSTIMER_H
 
 #include "Pattern"
 #include "Timer.h"
 
 namespace RSSD {
+namespace Core {
 
-class WindowsTimerFactory :
-	public Pattern::Singleton<WindowsTimerFactory>,
-	public TimerFactory
+class WindowsTimer : public Timer
 {
-	public:
-		virtual uint32_t getType() const { return Strid("WINDOWS_TIMER_FACTORY").getId(); }
+public:
+  typedef Timer::Factory::Impl<WindowsTimer> Factory;
 
-	public:
-		virtual Product* createImpl();
-}; // class WindowsTimerFactory
-
-class WindowsTimer : virtual public Timer
-{
-	public:
-		WindowsTimer();
-		virtual ~WindowsTimer();
-
-	public:
-		virtual uint32_t getType() const { return WindowsTimerFactory::getPointer()->getType(); }
-
-	public:
-		virtual void start();
-		virtual void stop();
-		virtual void reset();
-		virtual uint64_t getMicroseconds() const;
+  WindowsTimer();
+  virtual ~WindowsTimer();
+  virtual void start();
+  virtual void stop();
+  virtual void reset();
+  virtual uint64_t getMicroseconds() const;
 }; // class WindowsTimer
 
+} // namespace Core
 } // namespace RSSD
 
-#endif // RSSD_WINDOWSTIMER_H
+#endif // RSSD_CORE_TIMER_WINDOWSTIMER_H

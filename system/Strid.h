@@ -33,18 +33,17 @@
 #ifndef RSSD_CORE_SYSTEM_STRID_H
 #define RSSD_CORE_SYSTEM_STRID_H
 
-#include "Type.h"
-#include "Concurrency.h"
-#include "ThirdParty.h"
+#include "Types.h"
 
 namespace RSSD {
+namespace Core {
 
 /// @note 'id' is a keyword in some languages.
 /// @todo Consider alternatives to 'id' as a variable name.
 class Strid
 {
 public:
-  typedef std::map<std::string, uint32_t> Strid_m;
+  typedef std::map<string_t, uint32_t> Strid_m;
   typedef std::set<uint32_t> id_s;
 
 public:
@@ -53,9 +52,9 @@ public:
   Strid(uint32_t id, const char *text);
   Strid(const Strid &rhs);
   ~Strid();
-  static uint32_t getHash(const std::string &text);
+  static uint32_t getHash(const string_t &text);
   uint32_t getId() const { return this->_id; }
-  std::string getText() const { return this->_text; }
+  string_t getText() const { return this->_text; }
 
   inline Strid& operator =(const char *value)
   {
@@ -115,9 +114,10 @@ protected:
   static id_s HASHSET;
   static Strid_m HASHMAP;
   uint32_t _id;
-  std::string _text;
+  string_t _text;
 }; // class Strid
 
+} // namespace Core
 } // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_STRID_H

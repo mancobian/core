@@ -32,12 +32,10 @@
 #ifndef RSSD_CORE_SYSTEM
 #define RSSD_CORE_SYSTEM
 
-#include "system/Preprocess.h"
-#include "system/Platform.h"
-#include "system/ThirdParty.h"
-#include "system/Type.h"
+#include "ThirdParty"
+#include "system/Preprocessor.h"
+#include "system/Types.h"
+#include "system/Memory.h"
 #include "system/Strid.h"
-#include "system/Concurrency.h"
-// #include "system/Error.h"
 
 #endif // RSSD_CORE_SYSTEM

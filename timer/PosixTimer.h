@@ -30,49 +30,41 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_POSIXTIMER_H
-#define RSSD_POSIXTIMER_H
+#ifndef RSSD_CORE_TIMER_POSIXTIMER_H
+#define RSSD_CORE_TIMER_POSIXTIMER_H
 
 #include <sys/time.h>
 #include <timer/Timer.h>
 
 namespace RSSD {
+namespace Core {
+
 class PosixTimer;
 class PosixTimerFactory;
+
+} // namespace Core
 } // namespace RSSD
 
 namespace RSSD {
+namespace Core {
 
-class PosixTimerFactory :
-	public Pattern::Singleton<PosixTimerFactory>,
-	public TimerFactory
+class PosixTimer : public Timer
 {
-	public:
-		virtual uint32_t getType() const { return Strid("POSIX_TIMER_FACTORY").getId(); }
+public:
+  typedef Timer::Factory::Impl<PosixTimer> Factory;
 
-	public:
-		virtual Product* createImpl();
-}; // class PosixTimerFactory
+  PosixTimer();
+  virtual ~PosixTimer();
+  virtual void start();
+  virtual void stop();
+  virtual void reset();
+  virtual uint64_t getMicroseconds() const;
 
-class PosixTimer : virtual public Timer
-{
-	public:
-		PosixTimer();
-		virtual ~PosixTimer();
-
-	public:
-		virtual uint32_t getType() const { return PosixTimerFactory::getPointer()->getType(); }
-
-	public:
-		virtual void start();
-		virtual void stop();
-		virtual void reset();
-		virtual uint64_t getMicroseconds() const;
-
-	protected:
-		timeval _start, _stop;
+protected:
+  timeval _start, _stop;
 }; // class PosixTimer
 
+} // namespace Core
 } // namespace RSSD
 
-#endif // RSSD_POSIXTIMER_H
+#endif // RSSD_CORE_TIMER_POSIXTIMER_H

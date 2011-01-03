@@ -5,6 +5,7 @@
 #include <boost/assign.hpp>
 
 using namespace RSSD;
+using namespace RSSD::Core;
 
 ///
 /// @class Log
@@ -12,10 +13,10 @@ using namespace RSSD;
 
 ///
 /// @note typical US display e.g. 06/15/2003 08:31:20 (24 hr time)
-/// @deprecated const std::string Log::FORMAT_STRING = "%m-%d-%Y %I:%M:%S.%%06u";
+/// @deprecated const string_t Log::FORMAT_STRING = "%m-%d-%Y %I:%M:%S.%%06u";
 ///
 
-const std::string Log::FORMAT_STRING = "%H:%M:%S.%%06u";
+const string_t Log::FORMAT_STRING = "%H:%M:%S.%%06u";
 const char *Log::DEFAULT_GROUP = "";
 Log::LevelDescription_m Log::LEVEL_DESCRIPTIONS = boost::assign::map_list_of
 	(Log::Level::UNKNOWN, "?")
@@ -29,7 +30,7 @@ Log::LevelDescription_m Log::LEVEL_DESCRIPTIONS = boost::assign::map_list_of
 /// @reference http://stackoverflow.com/questions/1551597/using-strftime-in-c-how-can-i-format-time-exactly-like-a-unix-timestamp
 ///
 
-std::string Log::getTimestamp()
+string_t Log::getTimestamp()
 {
 	// Local vars
 	const uint32_t SIZE = Log::FORMAT_STRING.size() * 2;
@@ -54,7 +55,7 @@ std::string Log::getTimestamp()
 	return usec_buffer;
 }
 
-std::string Log::getPrefix(const Log::Entry &entry)
+string_t Log::getPrefix(const Log::Entry &entry)
 {
 	// Local vars
 	std::stringstream prefix;
@@ -79,7 +80,7 @@ std::string Log::getPrefix(const Log::Entry &entry)
 	return prefix.str();
 }
 
-Log::Log(const std::string &name) :
+Log::Log(const string_t &name) :
 	_is_file(true),
 	_level(Log::Level::NORMAL),
 	_name(name),
@@ -87,7 +88,7 @@ Log::Log(const std::string &name) :
 {
 }
 
-Log::Log(const std::string &name,
+Log::Log(const string_t &name,
 	std::streambuf *buffer) :
 	_is_file(false),
 	_level(Log::Level::NORMAL),
@@ -105,7 +106,7 @@ Log::~Log()
 	}
 }
 
-bool Log::operator ==(const std::string &name)
+bool Log::operator ==(const string_t &name)
 {
 	if (name.empty())
 		return false;
@@ -128,10 +129,10 @@ bool Log::operator ==(const Log &rhs)
 }
 
 void Log::log(
-	const std::string &message,
-	const std::string &file,
+	const string_t &message,
+	const string_t &file,
 	const size_t line,
-	const std::string &group,
+	const string_t &group,
 	const Log::Level::Type level)
 {
 	Log::Entry entry = {file, line, level, group, message};
@@ -140,9 +141,9 @@ void Log::log(
 
 void Log::log(
 	const std::stringstream &message,
-	const std::string &file,
+	const string_t &file,
 	const size_t line,
-	const std::string &group,
+	const string_t &group,
 	const Log::Level::Type level)
 {
 	Log::Entry entry = {file, line, level, group, message.str()};
@@ -178,7 +179,7 @@ LogManager::LogManager() :
 		true);
 }
 
-LogManager::LogManager(const std::string &name) :
+LogManager::LogManager(const string_t &name) :
 	Pattern::Manager<Log*>(),
 	_default_log(NULL)
 {
@@ -210,7 +211,7 @@ bool LogManager::hasLog(const std::streambuf *buffer)
 	return (this->getLog(buffer) != NULL);
 }
 
-bool LogManager::hasLog(const std::string &name)
+bool LogManager::hasLog(const string_t &name)
 {
 	return (this->getLog(name) != NULL);
 }
@@ -236,7 +237,7 @@ Log* LogManager::getLog(const std::streambuf *buffer)
 	return NULL;
 }
 
-Log* LogManager::getLog(const std::string &name)
+Log* LogManager::getLog(const string_t &name)
 {
 	Log_l::iterator
 		iter = this->_items.begin(),
@@ -251,7 +252,7 @@ Log* LogManager::getLog(const std::string &name)
 }
 
 Log* LogManager::createLog(
-	const std::string &name,
+	const string_t &name,
 	bool is_default)
 {
 	Log *log = new Log(name);
@@ -262,7 +263,7 @@ Log* LogManager::createLog(
 }
 
 Log* LogManager::createLog(
-	const std::string &name,
+	const string_t &name,
 	std::streambuf *buffer,
 	bool is_default)
 {
@@ -273,7 +274,7 @@ Log* LogManager::createLog(
 	return log;
 }
 
-bool LogManager::destroyLog(const std::string &name)
+bool LogManager::destroyLog(const string_t &name)
 {
 	Log *log = this->getLog(name);
 	return this->destroyLog(log);
@@ -292,8 +293,8 @@ void LogManager::destroyAllLogs()
 }
 
 void LogManager::log(
-	const std::string &message,
-	const std::string &file,
+	const string_t &message,
+	const string_t &file,
 	const size_t line,
 	...)
 {
@@ -312,7 +313,7 @@ void LogManager::log(
 
 void LogManager::log(
 	const std::stringstream &message,
-	const std::string &file,
+	const string_t &file,
 	const size_t line,
 	...)
 {

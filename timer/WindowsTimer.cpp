@@ -1,13 +1,9 @@
 #include "WindowsTimer.h"
 
 using namespace RSSD;
+using namespace RSSD::Core;
 
-template<> WindowsTimerFactory* Pattern::Singleton<WindowsTimerFactory>::_instance = NULL;
-
-TimerFactory::Product* WindowsTimerFactory::createImpl()
-{
-	return new WindowsTimer();
-}
+DECLARE_SINGLETON(RSSD::Core::WindowsTimer::Factory);
 
 WindowsTimer::WindowsTimer()
 {

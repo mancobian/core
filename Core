@@ -1,5 +1,5 @@
 ///
-/// @file core
+/// @file Core
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -33,10 +33,57 @@
 #ifndef RSSD_CORE_CORE
 #define RSSD_CORE_CORE
 
+#include "ThirdParty.h"
 #include "System"
 #include "Filesystem"
 #include "Pattern"
+#include "Concurrency"
 #include "Timer"
 #include "Input"
+#include "Serialization"
+
+namespace RSSD {
+namespace Core {
+
+void create()
+{
+  /// Timer
+  new Timer::Manager();
+  new PosixTimer::Factory();
+  new WindowsTimer::Factory();
+
+  /// Input
+  new Input::Device::Factory::Manager();
+  new Input::Keyboard::Factory();
+  new Input::Mouse::Factory();
+  new Input::OisKeyboard::Factory();
+  new Input::OisMouse::Factory();
+  
+  /// LibCDS
+  Concurrency::GarbageCollector::GarbageCollector::Construct();
+  cds::threading::Manager::attachThread();
+}
+
+void destroy()
+{
+  /// Timer
+  delete Timer::Manager::getPointer();
+  delete PosixTimer::Factory::getPointer();
+  delete WindowsTimer::Factory::getPointer();
+
+  /// Input
+  delete Input::Keyboard::Factory::getPointer();
+  delete Input::Mouse::Factory::getPointer();
+  delete Input::OisKeyboard::Factory::getPointer();
+  delete Input::OisMouse::Factory::getPointer();
+  delete Input::Device::Factory::Manager::getPointer();
+  
+  /// LibCDS
+  cds::threading::Manager::detachThread()   ;
+  Concurrency::GarbageCollector::GarbageCollector::Destruct();
+}
+
+} /// namespace Core
+} /// namespace RSSD
 
 #endif // RSSD_CORE_CORE

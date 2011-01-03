@@ -35,67 +35,59 @@
 
 #include "System"
 #include "Manager.h"
+#include "system/Memory.h"
 
 namespace RSSD {
-namespace Pattern {
-class Publication;
-class Subscriber;
-class Publisher;
-}
-}
-
-namespace RSSD {
+namespace Core {
 namespace Pattern {
 
-class Publication
+///
+/// @note typename T The object with which to update registered subscribers.
+///
+template <typename T>
+class Publisher
 {
 public:
-	Publication() : _publisher(NULL) {}
-	virtual ~Publication() {}
+  /// @todo Consider if the subscriber notification callback can be
+  ///  templated such that the target callback function may be supplied
+  ///  by a user and you can simply use the function call overloaded
+  ///  operator to invoke the target callback function.
+	class Subscriber
+	{
+	public:
+	  typedef std::tr1::shared_ptr<Subscriber> Pointer;
+	  typedef std::tr1::weak_ptr<Subscriber> WeakPointer;
 
-public:
-	virtual inline Publisher* getPublisher() const { return this->_publisher; }
-	virtual inline void setPublisher(Publisher *value) { this->_publisher = value; }
+	  virtual ~Subscriber() {}
+	  virtual void onNotification(const T &publication) = 0;
+	}; // class Subscriber
+
+	Publisher();
+	virtual ~Publisher();
+	void publish(const T &publication);
+	bool hasSubscriber(Subscriber *subscriber);
+	bool registerSubscriber(Subscriber *subscriber);
+	bool unregisterSubscriber(Subscriber *subscriber);
 
 protected:
-	Publisher *_publisher;
-}; // class Publication
+	typedef Pattern::Manager<typename Publisher<T>::Subscriber::WeakPointer> SubscriberManager;
 
-class Subscriber
-{
-public:
-	virtual ~Subscriber();
-
-public:
-	virtual bool onSubscriptionPublished(Publication *publication) = 0;
-}; // class Subscriber
-
-class Publisher : virtual public Pattern::Manager<Subscriber*>
-{
-public:
-	typedef Pattern::Manager<Subscriber*> Base;
-
-public:
-	virtual ~Publisher()
-	{}
-
-public:
-	bool publish(Publication *publication)
-	{
-		// TODO: Re-factor to use std::for_each() algorithm
-		Base::Item_l::iterator iter = this->_items.begin(),
-			end = this->_items.end();
-		while (iter != end)
-		{
-			Subscriber *subscriber = *iter++;
-			if (!subscriber->onSubscriptionPublished(publication))
-				return false;
-		}
-		return true;
-	}
+	typename SubscriberManager::Pointer mSubscriberManager;
 }; // class Publisher
 
+///
+/// Includes
+///
+
+#include "Publisher-inl.h"
+
 } // namespace Pattern
+} // namespace Core
 } // namespace RSSD
+
+template <typename T>
+bool operator ==(
+    const std::tr1::weak_ptr<typename RSSD::Core::Pattern::Publisher<T>::Subscriber>& a,
+    const std::tr1::weak_ptr<typename RSSD::Core::Pattern::Publisher<T>::Subscriber>& b);
 
 #endif // RSSD_CORE_PATTERN_PUBLISHER_H
