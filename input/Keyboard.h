@@ -10,13 +10,13 @@
 /// modification, are permitted provided that the following conditions are met:
 ///
 ///    * Redistributions of source code must retain the above copyright notice,
-/// 		this list of conditions and the following disclaimer.
+///     this list of conditions and the following disclaimer.
 ///    * Redistributions in binary form must reproduce the above copyright notice,
-/// 		this list of conditions and the following disclaimer in the documentation
-/// 		and/or other materials provided with the distribution.
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
 ///    * Neither the name of The Secret Design Collective nor the names of its
-/// 		contributors may be used to endorse or promote products derived from
-/// 		this software without specific prior written permission.
+///     contributors may be used to endorse or promote products derived from
+///     this software without specific prior written permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 /// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -39,41 +39,18 @@ namespace RSSD {
 namespace Core {
 namespace Input {
 
-class Keyboard : public BaseDevice<Keyboard>
+class Keyboard
 {
 public:
-  typedef Device::Factory::Impl<Keyboard> Factory;
-
-  class State : public Device::State
+  struct Event
   {
-  public:
-    State();
-    virtual ~State();
-    const uint_t getKeyState(const uint_t keycode) const { return this->mKeys[keycode]; }
-
-    static const uint_t NUM_KEYS = 256;
-
-  protected:
-    uint_t mKeys[NUM_KEYS];
-  }; /// class State
-
-  class Event : public Device::Event
-  {
-  public:
-    enum Type
+    enum
     {
-      UNKNOWN = 0,
-      PRESS = 1<<0,
-      RELEASE = 1<<1,
-      COUNT = 1<<2
-    }; /// enum Type
-
-    Event(const uint_t eventType = Event::UNKNOWN);
-    virtual ~Event();
+      PRESS = 1,
+      RELEASE,
+      COUNT
+    };
   }; /// class Event
-
-  Keyboard();
-  virtual ~Keyboard();
 }; /// class Keyboard
 
 } /// namespace Input

@@ -20,7 +20,7 @@ Publisher<T>::~Publisher()
 ///   http://schneide.wordpress.com/2008/12/08/observerlistener-structures-in-c-with-boosts-smart-pointers/
 ///
 template <typename T>
-void Publisher<T>::publish(const T &publication)
+void Publisher<T>::publish(T &publication)
 {
   /// @todo Re-factor to use std::for_each() algorithm
   typename SubscriberManager::ItemList::iterator

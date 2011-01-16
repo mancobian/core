@@ -59,12 +59,12 @@ public:
 	  typedef std::tr1::weak_ptr<Subscriber> WeakPointer;
 
 	  virtual ~Subscriber() {}
-	  virtual void onNotification(const T &publication) = 0;
+	  virtual void onNotification(T &publication) = 0;
 	}; // class Subscriber
 
 	Publisher();
 	virtual ~Publisher();
-	void publish(const T &publication);
+	void publish(T &publication);
 	bool hasSubscriber(Subscriber *subscriber);
 	bool registerSubscriber(Subscriber *subscriber);
 	bool unregisterSubscriber(Subscriber *subscriber);

@@ -10,13 +10,13 @@
 /// modification, are permitted provided that the following conditions are met:
 ///
 ///    * Redistributions of source code must retain the above copyright notice,
-/// 		this list of conditions and the following disclaimer.
+///     this list of conditions and the following disclaimer.
 ///    * Redistributions in binary form must reproduce the above copyright notice,
-/// 		this list of conditions and the following disclaimer in the documentation
-/// 		and/or other materials provided with the distribution.
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
 ///    * Neither the name of The Secret Design Collective nor the names of its
-/// 		contributors may be used to endorse or promote products derived from
-/// 		this software without specific prior written permission.
+///     contributors may be used to endorse or promote products derived from
+///     this software without specific prior written permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 /// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -40,36 +40,77 @@ namespace RSSD {
 namespace Core {
 namespace Concurrency {
 
-class ITask
+class Task
 {
 public:
-  typedef SharedPointer<ITask> Pointer;
+  typedef Pattern::Factory<Task> Factory;
+  typedef Factory::Manager Manager;
 
-  virtual ~ITask() {}
-  virtual void operator()() = 0;
-}; /// class ITask
+  struct Priority
+  {
+    enum
+    {
+      UNKNOWN = 0,
+      LOW,
+      MEDIUM,
+      HIGH,
+      COUNT
+    };
+  };
 
-template <typename FUNCTION>
-class Task :
-  boost::noncopyable,
-  public ITask,
-  public RSSD::Core::Pattern::Publisher<Task<FUNCTION> >
+  virtual ~Task() {}
+  virtual void run() = 0;
+  virtual uint32_t getType() const = 0;
+  template <typename TRAITS> static typename TRAITS::IdType generateTaskId()
+  {
+    return TRAITS::generateTaskId();
+  }
+}; /// class Task
+
+template <typename TRAITS>
+class BaseTask : public Task
 {
 public:
-  typedef Pattern::Publisher<Task<FUNCTION> > Publisher;
-  typedef typename Publisher::Subscriber Subscriber;
-  typedef SharedPointer<Task> Pointer;
+  typedef SharedPointer<BaseTask<TRAITS> > Pointer;
+  typedef typename TRAITS::IdType IdType;
+  typedef typename TRAITS::InputType InputType;
+  typedef typename TRAITS::OutputType OutputType;
+  typedef std::tr1::function<OutputType(InputType)> FunctorType;
 
-  Task();
-  Task(FUNCTION function);
-  virtual ~Task();
-  virtual void operator()();
-  void set(FUNCTION function);
+  struct Traits
+  {
+    typedef uint32_t IdType;
+    typedef void InputType; /// @note Must be copy-constructible and assignable.
+    typedef void OutputType; /// @note Must be copy-constructible and assignable.
+    static IdType generateTaskId() { return 0; }
+  }; /// struct Traits
+
+  BaseTask(
+    const bool recurring = false,
+    const uint32_t priority = Task::Priority::MEDIUM,
+    const IdType dependency = 0,
+    const TRAITS &traits = TRAITS());
+  BaseTask(const BaseTask<TRAITS> &rhs);
+  virtual ~BaseTask();
+  DEFINE_PROPERTY_INLINE(bool, Recurring, mRecurring);
+  DEFINE_PROPERTY_INLINE(IdType, Priority, mPriority);
+  DEFINE_PROPERTY_INLINE(IdType, TaskId, mTaskId);
+  DEFINE_PROPERTY_INLINE(IdType, Dependency, mDependency);
+  DEFINE_PROPERTY_INLINE(FunctorType, Functor, mFunctor);
+  FORCE_INLINE OutputType operator()(InputType value);
+
+  /// @hack REMOVE THIS!
+  virtual void run() {}
+  virtual uint32_t getType() const { return 0; }
 
 protected:
-  bool mSet;
-  FUNCTION mFunction;
-}; /// class Task
+  bool mRecurring;
+  IdType mPriority;
+  IdType mTaskId;
+  TRAITS mTraits;
+  IdType mDependency;
+  FunctorType mFunctor;
+}; /// class BaseTask
 
 ///
 /// Includes
@@ -80,5 +121,23 @@ protected:
 } /// namespace Concurrency
 } /// namespace Core
 } /// namespace RSSD
+
+namespace std {
+
+template <>
+template <typename TRAITS>
+struct less<RSSD::Core::Concurrency::BaseTask<TRAITS> >
+{
+  bool operator() (
+    const typename RSSD::Core::Concurrency::BaseTask<TRAITS>::Pointer &x,
+    const typename RSSD::Core::Concurrency::BaseTask<TRAITS>::Pointer &y) const
+  {
+    if (x->getPriority() == y->getPriority())
+      return (x->getTaskID() < y->getTaskId());
+    return (x->getPriority() < y->getPriority());
+  }
+}; /// struct less
+
+} /// namespace std
 
 #endif /// RSSD_CORE_CONCURRENCY_TASK_H

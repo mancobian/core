@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file Timer.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,24 +30,66 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_UTILITIES_TIMER_H
+#define RSSD_CORE_UTILITIES_TIMER_H
 
-#include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
+#include "System"
+#include "Pattern"
 
 namespace RSSD {
 namespace Core {
-namespace Concurrency {
+namespace Utilities {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+class Timer
+{
+public:
+  typedef Pattern::Factory<Timer> Factory;
+  typedef Factory::Manager Manager;
 
-} /// namespace Concurrency
+  Timer() {}
+  virtual ~Timer() {}
+  virtual void start() = 0;
+  virtual void stop() = 0;
+  virtual void reset() = 0;
+  /// @note Elapsed time in integer microseconds
+  /// @note 2^64 useconds = ~584554.431 years
+  virtual uint64_t getMicroseconds() const = 0;
+
+  inline virtual float64_t getMilliseconds() const
+  {
+    return static_cast<float64_t>(this->getMicroseconds())
+      / static_cast<float64_t>(USEC_PER_MSEC);
+  }
+
+  inline virtual float64_t getSeconds() const
+  {
+    return static_cast<float64_t>(this->getMicroseconds())
+      / static_cast<float64_t>(USEC_PER_SEC);
+  }
+
+  static const uint64_t USEC_PER_SEC = 1000000;
+  static const uint64_t USEC_PER_MSEC = 1000;
+}; // class Timer
+
+template <typename IMPL>
+class BaseTimer : public Timer
+{
+public:
+  typedef Timer::Factory::Impl<BaseTimer<IMPL> > Factory;
+
+  BaseTimer(params_t &params) : mImpl(params) {}
+  virtual ~BaseTimer() {}
+  virtual void start() { this->mImpl.start(); }
+  virtual void stop() { this->mImpl.stop(); }
+  virtual void reset() { this->mImpl.reset(); }
+  virtual uint64_t getMicroseconds() const { return this->mImpl.getMicroseconds(); };
+
+protected:
+  IMPL mImpl;
+}; /// class BaseTimer
+
+} /// namespace Utilities
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif // RSSD_CORE_UTILITIES_TIMER_H

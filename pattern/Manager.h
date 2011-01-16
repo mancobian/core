@@ -79,12 +79,8 @@ class Manager : public boost::noncopyable
 	public:
 		Manager();
 		virtual ~Manager();
-
-	public:
 		virtual inline ItemList& getItems() { return this->_items; }
 		virtual inline const ItemList& getItems() const { return this->_items; }
-
-	public:
 		virtual Handle get(const ITEM &item);
 		virtual bool has(const ITEM &item);
 		virtual uint32_t size() const;
@@ -108,12 +104,8 @@ public:
 public:
   Manager();
   virtual ~Manager();
-
-public:
   virtual inline ItemList& getItems() { return this->_items; }
   virtual inline const ItemList& getItems() const { return this->_items; }
-
-public:
   virtual Handle get(const Item &item);
   virtual bool has(const Item &item);
   virtual uint32_t size() const;
@@ -137,8 +129,8 @@ public:
 public:
   Manager();
   virtual ~Manager();
-
-public:
+  virtual inline ItemList& getItems() { return this->_items; }
+  virtual inline const ItemList& getItems() const { return this->_items; }
   virtual Handle get(const Item *item);
   virtual bool has(const Item *item);
   virtual uint32_t size() const;

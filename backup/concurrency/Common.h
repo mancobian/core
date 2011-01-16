@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file Common.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,24 +30,24 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_CONCURRENCY_COMMON_H
+#define RSSD_CORE_CONCURRENCY_COMMON_H
 
-#include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
+#include "System"
+#include "Pattern"
+#include "concurrency/Types.h"
 
 namespace RSSD {
 namespace Core {
 namespace Concurrency {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+uint32_t getHardwareConcurrency()
+{
+  return boost::thread::hardware_concurrency();
+}
 
 } /// namespace Concurrency
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif /// RSSD_CORE_CONCURRENCY_COMMON_H

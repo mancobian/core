@@ -1,5 +1,5 @@
 ///
-/// @file MouseState.h
+/// @file Mouse.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -33,45 +33,28 @@
 #ifndef RSSD_CORE_INPUT_MOUSE_H
 #define RSSD_CORE_INPUT_MOUSE_H
 
-#include "input/Device.h"
-
 namespace RSSD {
 namespace Core {
 namespace Input {
 
-class Mouse : public BaseDevice<Mouse>
+class Mouse
 {
 public:
-  typedef Device::Factory::Impl<Mouse> Factory;
-
   struct Button
   {
-    enum Type
+    enum
     {
       UNKNOWN = 0,
       LEFT,
       RIGHT,
       MIDDLE,
       COUNT
-    }; /// enum Type
+    }; /// enum
   }; /// struct Button
 
-  class State : public Device::State
+  struct Event
   {
-  public:
-    typedef std::map<uint32_t, uint32_t> ButtonMap;
-
-    State();
-    virtual ~State();
-
-  protected:
-    ButtonMap mButtons;
-  }; /// class State
-
-  class Event : public Device::Event
-  {
-  public:
-    enum Type
+    enum
     {
       UNKNOWN = 0,
       MOVE,
@@ -81,14 +64,8 @@ public:
       DOUBLE_CLICK,
       SCROLL,
       COUNT
-    }; /// enum Type
-
-    Event(const uint_t eventType = Event::UNKNOWN);
-    virtual ~Event();
-  }; /// class Event
-
-  Mouse();
-  virtual ~Mouse();
+    }; /// enum
+  }; /// struct Event
 }; /// class Mouse
 
 } /// namespace Input

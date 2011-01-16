@@ -39,7 +39,7 @@
 #include <pattern/Manager.h>
 #include <input/InputManager.h>
 
-namespace OIS {
+namespace Ois {
 class InputManager;
 class Keyboard;
 class Mouse;
@@ -47,7 +47,7 @@ TYPEDEF_PTR_CONTAINERS(Keyboard);
 TYPEDEF_PTR_CONTAINERS(Mouse);
 typedef std::list<Keyboard*> KeyboardManager_l;
 typedef std::list<Mouse*> MouseManager_l;
-} // namespace OIS
+} // namespace Ois
 
 namespace Nous {
 namespace Input {

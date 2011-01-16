@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file WindowsTimer.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,24 +30,31 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_UTILTIES_IMPL_WINDOWSTIMER_H
+#define RSSD_CORE_UTILTIES_IMPL_WINDOWSTIMER_H
 
-#include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
+#include "System"
+#include "utilities/Timer.h"
 
 namespace RSSD {
 namespace Core {
-namespace Concurrency {
+namespace Utilities {
+namespace Impl {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+class WindowsTimer
+{
+public:
+  WindowsTimer(params_t &params);
+  virtual ~WindowsTimer();
+  virtual void start();
+  virtual void stop();
+  virtual void reset();
+  virtual uint64_t getMicroseconds() const;
+}; // class WindowsTimer
 
-} /// namespace Concurrency
+} /// namespace Impl
+} /// namespace Utilities
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif // RSSD_CORE_UTILTIES_IMPL_WINDOWSTIMER_H

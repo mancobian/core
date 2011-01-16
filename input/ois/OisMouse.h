@@ -10,13 +10,13 @@
 /// modification, are permitted provided that the following conditions are met:
 ///
 ///    * Redistributions of source code must retain the above copyright notice,
-/// 		this list of conditions and the following disclaimer.
+///     this list of conditions and the following disclaimer.
 ///    * Redistributions in binary form must reproduce the above copyright notice,
-/// 		this list of conditions and the following disclaimer in the documentation
-/// 		and/or other materials provided with the distribution.
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
 ///    * Neither the name of The Secret Design Collective nor the names of its
-/// 		contributors may be used to endorse or promote products derived from
-/// 		this software without specific prior written permission.
+///     contributors may be used to endorse or promote products derived from
+///     this software without specific prior written permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 /// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -30,36 +30,52 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_INPUT_OISMOUSE_H
-#define RSSD_CORE_INPUT_OISMOUSE_H
+#ifndef RSSD_CORE_INPUT_IMPL_OISMOUSE_H
+#define RSSD_CORE_INPUT_IMPL_OISMOUSE_H
 
 #include <OIS/OIS.h>
 #include "input/Mouse.h"
+#include "input/ois/OisTraits.h"
 #include "input/ois/OisDevice.h"
 
 namespace RSSD {
 namespace Core {
 namespace Input {
+namespace Impl {
 
-class OisMouse :
-  public Mouse,
-  public OisDevice
+struct OisMouse :
+  public OIS::MouseListener,
+  public OisDevice<OIS::Mouse>
 {
 public:
-  typedef Device::Factory::Impl<OisMouse> Factory;
-  typedef SharedPointer<OisMouse> Pointer;
+  static const uint32_t TYPE = Device::Types::MOUSE;
 
-  OisMouse(OIS::Mouse *mouse);
-  virtual ~OisMouse();
-  OIS::Object* getOisObject() { return this->mMouse; }
-  virtual bool update(const float_t elapsed) { return true; }
+  class State
+  {
+  public:
+    typedef std::map<uint32_t, uint32_t> ButtonMap;
+
+    State();
+    ~State();
+
+  protected:
+    ButtonMap mButtons;
+  }; /// class State
+
+  OisMouse(params_t &params);
+  ~OisMouse();
+  bool update(const float32_t elapsed);
+  virtual bool mouseMoved(const OIS::MouseEvent &e);
+  virtual bool mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+  virtual bool mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
 protected:
-  OIS::Mouse *mMouse;
-}; /// class OisMouse
+  State mState;
+}; /// struct OisMouse
 
+} /// namespace Impl
 } /// namespace Input
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_INPUT_OISMOUSE_H
+#endif // RSSD_CORE_INPUT_IMPL_OISMOUSE_H

@@ -10,13 +10,13 @@
 /// modification, are permitted provided that the following conditions are met:
 ///
 ///    * Redistributions of source code must retain the above copyright notice,
-/// 		this list of conditions and the following disclaimer.
+///     this list of conditions and the following disclaimer.
 ///    * Redistributions in binary form must reproduce the above copyright notice,
-/// 		this list of conditions and the following disclaimer in the documentation
-/// 		and/or other materials provided with the distribution.
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
 ///    * Neither the name of The Secret Design Collective nor the names of its
-/// 		contributors may be used to endorse or promote products derived from
-/// 		this software without specific prior written permission.
+///     contributors may be used to endorse or promote products derived from
+///     this software without specific prior written permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 /// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -44,7 +44,33 @@ class Device
 {
 public:
   typedef Pattern::Factory<Device> Factory;
+  typedef Factory::Manager Manager;
 
+  struct Params
+  {
+    enum Values
+    {
+      DEVICE_HANDLE = 0,
+      WINDOW_HANDLE,
+      COUNT
+    };
+  }; /// enum Params
+
+  struct Types
+  {
+    enum Values
+    {
+      UNKNOWN = 0,
+      MOUSE,
+      KEYBOARD,
+      GAMEPAD,
+      TOUCH,
+      VOICE,
+      COUNT
+    };
+  };
+
+#if 0
   class State
   {
   public:
@@ -77,25 +103,30 @@ public:
   protected:
     uint_t mDeviceType, mEventType;
   }; /// class Event
+#endif
 
-  Device(const uint_t type, State *state = NULL) : mType(type), mState(state) {}
-  virtual ~Device() { if (this->mState.get()) { this->mState.reset(); } }
-  inline virtual uint_t getType() const { return this->mType; }
+  virtual ~Device() {}
+  virtual uint32_t getType() const = 0;
   virtual bool update(const float_t elapsed) = 0;
+}; /// class Device
 
-protected:
-  uint_t mType;
-  State::Pointer mState;
-}; /// struct Device
-
-template <typename T>
+template <typename IMPL>
 class BaseDevice : public Device
 {
 public:
-  static const uint_t TYPE;
+  typedef IMPL ImplType;
+  typedef typename IMPL::State StateType;
+  typedef typename IMPL::Traits::DeviceHandleType DeviceHandleType;
+  typedef typename IMPL::Traits::WindowHandleType WindowHandleType;
+  typedef Device::Factory::Impl<BaseDevice<IMPL> > Factory;
 
-  BaseDevice(State *state = NULL) : Device(BaseDevice<T>::TYPE, state) {}
+  BaseDevice(params_t &params) : mImpl(params) {}
   virtual ~BaseDevice() {}
+  virtual uint32_t getType() const { return IMPL::TYPE; }
+  virtual bool update(const float_t elapsed) { return this->mImpl.update(elapsed); }
+
+protected:
+  ImplType mImpl;
 }; /// class BaseDevice
 
 } /// namespace Input

@@ -56,16 +56,14 @@ public:
     public Pattern::Manager<T*>
   {
   public:
+    /// @todo Research way(s) to make this a compile-time constant integer.
+    static /*const*/ uint32_t TYPE;
+
     Impl();
     virtual ~Impl();
-    static uint_t getType() { return Impl<U>::TYPE; }
-    virtual T* create();
+    virtual const uint32_t getType() const { return Impl<U>::TYPE; }
+    virtual T* create(params_t &params = params_t());
     virtual void destroy(T *value);
-
-    static const uint_t TYPE;
-
-  protected:
-    virtual T* createImpl() const { return new U(); }
   }; /// class Impl
 
   class Manager :
@@ -76,15 +74,13 @@ public:
     typedef typename std::map<uint_t, Factory<T>*> FactoryMap;
 
     Manager();
-    ~Manager();
+    virtual ~Manager();
     bool hasFactory(const uint_t type);
     Factory<T>* getFactory(const uint_t type);
     bool registerFactory(Factory<T> *factory);
     Factory<T>* unregisterFactory(const uint_t type);
-    static const uint_t generateFactoryId();
 
   protected:
-    static uint_t FACTORY_ID; /// @note First valid ID starts at 1.
     FactoryMap mFactories;
   }; // class Manager
 
@@ -94,8 +90,12 @@ public:
   bool operator <(const uint32_t &value) const;
   bool operator ==(const Factory &value) const;
   bool operator <(const Factory &value) const;
-  virtual T* create() = 0;
+  virtual const uint32_t getType() const = 0;
+  virtual T* create(params_t &params = params_t()) = 0;
   virtual void destroy(T *value) = 0;
+
+public:
+  static uint32_t TYPEID;
 }; // class Factory
 
 #include "Factory-inl.h"

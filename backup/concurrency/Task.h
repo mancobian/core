@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file Task.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,24 +30,55 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_CONCURRENCY_TASK_H
+#define RSSD_CORE_CONCURRENCY_TASK_H
 
-#include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
+#include "System"
+#include "Pattern"
 
 namespace RSSD {
 namespace Core {
 namespace Concurrency {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+class ITask
+{
+public:
+  typedef SharedPointer<ITask> Pointer;
+
+  virtual ~ITask() {}
+  virtual void operator()() {};
+}; /// class ITask
+
+template <typename FUNCTION>
+class Task :
+  boost::noncopyable,
+  public ITask,
+  public RSSD::Core::Pattern::Publisher<Task<FUNCTION> >
+{
+public:
+  typedef Pattern::Publisher<Task<FUNCTION> > Publisher;
+  typedef typename Publisher::Subscriber Subscriber;
+  typedef SharedPointer<Task> Pointer;
+
+  Task();
+  Task(FUNCTION function);
+  virtual ~Task();
+  virtual void operator()();
+  void set(FUNCTION function);
+
+protected:
+  bool mSet;
+  FUNCTION mFunction;
+}; /// class Task
+
+///
+/// Includes
+///
+
+#include "concurrency/Task-inl.h"
 
 } /// namespace Concurrency
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif /// RSSD_CORE_CONCURRENCY_TASK_H

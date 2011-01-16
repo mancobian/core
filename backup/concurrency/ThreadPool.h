@@ -1,5 +1,5 @@
 ///
-/// @file InputManager.h
+/// @file ThreadPool.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,41 +30,51 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_INPUT_INPUTMANAGER_H
-#define RSSD_CORE_INPUT_INPUTMANAGER_H
+#ifndef RSSD_CORE_CONCURRENCY_THREADPOOL_H
+#define RSSD_CORE_CONCURRENCY_THREADPOOL_H
 
-#include "System"
-#include "Pattern"
-#include "input/Device.h"
+#include "concurrency/Task.h"
+#include "concurrency/Thread.h"
+#include "concurrency/Common.h"
 
 namespace RSSD {
 namespace Core {
-namespace Input {
+namespace Concurrency {
 
-template <typename IMPL>
-class InputManager : public Pattern::Singleton<InputManager<IMPL> >
+class ThreadPool : public Thread::Subscriber
 {
 public:
-  typedef IMPL ImplType;
-  typedef typename IMPL::Traits Traits;
-  typedef typename IMPL::Traits::DeviceHandleType DeviceHandleType;
-  typedef typename IMPL::Traits::WindowHandleType WindowHandleType;
+  typedef Containers<ITask*> TaskContainers;
+  typedef Containers<Thread*> ThreadContainers;
+  typedef SharedPointer<Barrier> BarrierPointer;
 
-  InputManager(typename IMPL::Traits::WindowHandleType windowHandle = 0) : mImpl(windowHandle) {}
-  ~InputManager() {}
-  bool isDeviceAvailable(const uint32_t type) { return this->mImpl.isDeviceAvailable(type); }
-  bool create(typename IMPL::Traits::WindowHandleType windowHandle) { return this->mImpl.create(windowHandle); }
-  bool destroy() { return this->mImpl.destroy(); }
-  bool update(const float32_t elapsed) { return this->mImpl.update(elapsed); }
-  Device* createDevice(const uint32_t type) { return this->mImpl.createDevice(type); }
-  bool destroyDevice(Device *device) { return this->mImpl.destroyDevice(device); }
+  ThreadPool(const uint32_t size = DEFAULT_SIZE);
+  virtual ~ThreadPool();
+  FORCE_INLINE BarrierPointer getBarrier() { return this->mBarrier; }
+  FORCE_INLINE uint32_t numActiveThreads() const { return this->mActiveThreads.size(); }
+  FORCE_INLINE uint32_t numIdleThreads() const { return this->mIdleThreads.size(); }
+  FORCE_INLINE uint32_t numTotalThreads() const { return (this->mIdleThreads.size() + this->mActiveThreads.size()); }
+  virtual void resize(const uint32_t size);
+  virtual void clear();
+  virtual bool sync();
+  virtual bool assign(ITask *task);
 
 protected:
-  ImplType mImpl;
-}; /// class InputManager
+  virtual void onNotification(Thread *thread);
 
-} /// namespace Input
+  static const uint32_t DEFAULT_SIZE;
+  volatile bool mSync;
+  volatile uint32_t mRequestedSize;
+  BarrierPointer mBarrier;
+  AssociativeContainers<Thread::id_t, Thread::Pointer>::Map mActiveThreads;
+  // TaskContainers::Queue mPendingTasks;
+  // ThreadContainers::Queue mIdleThreads;
+  cds::queue::LMSQueue<GarbageCollector, ITask*> mPendingTasks;
+  cds::queue::LMSQueue<GarbageCollector, Thread*> mIdleThread;
+}; /// class ThreadPool
+
+} /// namespace Concurrency
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_INPUT_INPUTMANAGER_H
+#endif /// RSSD_CORE_CONCURRENCY_THREADPOOL_H

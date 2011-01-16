@@ -30,10 +30,30 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_INPUT_H
-#define RSSD_INPUT_H
+#ifndef RSSD_CORE_INPUT_H
+#define RSSD_CORE_INPUT_H
 
+// #include "input/Buffer.h"
+#include "input/Device.h"
+#include "input/Keyboard.h"
+#include "input/Mouse.h"
 #include "input/InputManager.h"
+
+#include "input/ois/OisDevice.h"
+#include "input/ois/OisKeyboard.h"
+#include "input/ois/OisMouse.h"
 #include "input/ois/OisInputManager.h"
 
-#endif // RSSD_INPUT_H
+namespace RSSD {
+namespace Core {
+namespace Input {
+
+typedef BaseDevice<Impl::OisMouse> BasicMouse;
+typedef BaseDevice<Impl::OisKeyboard> BasicKeyboard;
+typedef InputManager<Impl::OisInputManager> BasicInputManager;
+
+} /// namespace Input
+} /// namespace Core
+} /// namespace RSSD
+
+#endif // RSSD_CORE_INPUT_H

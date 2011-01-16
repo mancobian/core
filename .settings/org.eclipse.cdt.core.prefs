@@ -1,0 +1,14 @@
+#Mon Jan 10 17:35:29 EST 2011
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077.934244888/PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077.934244888/PATH/operation=replace
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077.934244888/PATH/value=/opt/ogre/eihort/bin\:/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/usr/games\:${TBB30_INSTALL_DIR}
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077.934244888/append=true
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077.934244888/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077/append=true
+environment/project/cdt.managedbuild.config.gnu.so.debug.1193345077/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.so.release.702597570/PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.so.release.702597570/PATH/operation=replace
+environment/project/cdt.managedbuild.config.gnu.so.release.702597570/PATH/value=/opt/ogre/eihort/bin\:/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/usr/games\:${TBB30_INSTALL_DIR}
+environment/project/cdt.managedbuild.config.gnu.so.release.702597570/append=true
+environment/project/cdt.managedbuild.config.gnu.so.release.702597570/appendContributed=true

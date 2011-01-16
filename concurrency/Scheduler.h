@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file Scheduler.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -10,13 +10,13 @@
 /// modification, are permitted provided that the following conditions are met:
 ///
 ///    * Redistributions of source code must retain the above copyright notice,
-/// 		this list of conditions and the following disclaimer.
+///     this list of conditions and the following disclaimer.
 ///    * Redistributions in binary form must reproduce the above copyright notice,
-/// 		this list of conditions and the following disclaimer in the documentation
-/// 		and/or other materials provided with the distribution.
+///     this list of conditions and the following disclaimer in the documentation
+///     and/or other materials provided with the distribution.
 ///    * Neither the name of The Secret Design Collective nor the names of its
-/// 		contributors may be used to endorse or promote products derived from
-/// 		this software without specific prior written permission.
+///     contributors may be used to endorse or promote products derived from
+///     this software without specific prior written permission.
 ///
 /// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 /// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -30,24 +30,44 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_CONCURRENCY_SCHEDULER_H
+#define RSSD_CORE_CONCURRENCY_SCHEDULER_H
 
+#include "System"
+#include "Pattern"
 #include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
 
 namespace RSSD {
 namespace Core {
 namespace Concurrency {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+template <typename IMPL>
+class Scheduler : public Pattern::Singleton<Scheduler<IMPL> >
+{
+public:
+  typedef IMPL ImplType;
+  typedef typename IMPL::TaskType TaskType;
+
+  Scheduler();
+  virtual ~Scheduler();
+  virtual bool registerTask(const TaskType &task);
+  virtual bool unregisterTask(const typename TaskType::IdType taskType);
+  virtual void clear();
+  virtual void schedule();
+  virtual void run(const bool wait = true);
+
+protected:
+  ImplType mImpl;
+}; /// class Scheduler
+
+///
+/// Includes
+///
+
+#include "concurrency/Scheduler-inl.h"
 
 } /// namespace Concurrency
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif ///RSSD_CORE_CONCURRENCY_SCHEDULER_H

@@ -1,14 +1,48 @@
 #include "input/ois/OisInputManager.h"
+#include "input/Device.h"
+#include "input/Keyboard.h"
+#include "input/Mouse.h"
 #include "input/ois/OisKeyboard.h"
 #include "input/ois/OisMouse.h"
 
 using namespace RSSD;
 using namespace RSSD::Core;
 using namespace RSSD::Core::Input;
+using namespace RSSD::Core::Input::Impl;
 
-OisInputManager::OisInputManager(const uint_t windowHandle) :
+OisInputManager::OisInputManager(OisInputManager::Traits::WindowHandleType windowHandle) :
   mInputSystem(NULL)
 {
+  if (windowHandle) { this->create(windowHandle); }
+}
+
+OisInputManager::~OisInputManager()
+{
+  this->destroy();
+}
+
+OIS::Type OisInputManager::toOisType(const uint32_t type)
+{
+  switch (type)
+  {
+    case Device::Types::MOUSE: { return OIS::OISMouse; }
+    case Device::Types::KEYBOARD: { return OIS::OISKeyboard; }
+    default: { break; }
+  }
+  return OIS::OISUnknown;
+}
+
+bool OisInputManager::isDeviceAvailable(const OIS::Type type) const
+{
+  assert ((this->mInputSystem->getNumberOfDevices(type) > 0)  && "No devices detected of the given type.");
+  return true;
+}
+
+bool OisInputManager::create(const Traits::WindowHandleType windowHandle)
+{
+  /// Error checking
+  assert (this->mInputSystem == NULL);
+
   /// Prepare window handle for paramater list
   std::stringstream ss;
   ss << windowHandle;
@@ -19,19 +53,23 @@ OisInputManager::OisInputManager(const uint_t windowHandle) :
 
   /// Create input system
   this->mInputSystem = OIS::InputManager::createInputSystem(params);
+  return true;
 }
 
-OisInputManager::~OisInputManager()
+bool OisInputManager::destroy()
 {
   /// Destroy input system
   OIS::InputManager::destroyInputSystem(this->mInputSystem);
+  this->mInputSystem = NULL;
+  return true;
 }
 
 bool OisInputManager::update(const float_t elapsed)
 {
-  Manager::ItemList::iterator
-    iter = this->_items.begin(),
-    end = this->_items.end();
+  DeviceManager::ItemList &items = this->getItems();
+  DeviceManager::ItemList::iterator
+    iter = items.begin(),
+    end = items.end();
   for (; iter != end; ++iter)
   {
     (*iter)->update(elapsed);
@@ -41,100 +79,56 @@ bool OisInputManager::update(const float_t elapsed)
 
 Device* OisInputManager::createDevice(const uint32_t type)
 {
-  Device *device = NULL;
+  return this->createDevice(type, true);
+}
 
-  if (device->getType() == Keyboard::TYPE) { device = this->createKeyboard(); }
-  else if (device->getType() == Mouse::TYPE) { device = this->createMouse(); }
-  else { assert (false && "Unrecognized device type."); }
+Device* OisInputManager::createDevice(const uint32_t type, const bool isBuffered)
+{
+  const OIS::Type oisType = OisInputManager::toOisType(type);
+  if (!this->isDeviceAvailable(oisType)) { return NULL; }
 
-  if (device) { this->add(device); }
+  Traits::DeviceHandleType deviceHandle = this->mInputSystem->createInputObject(oisType, isBuffered);
+  params_t params;
+  params.insert(std::make_pair(Device::Params::DEVICE_HANDLE, deviceHandle));
+  Device *device = Device::Manager::getPointer()->getFactory(type)->create(params);
+
+  this->add(device);
   return device;
 }
 
-Device* OisInputManager::createKeyboard()
+bool OisInputManager::destroyDevice(Input::Device *device)
 {
-  Device *device = NULL;
+  if (!device) { return false; }
+  this->remove(device);
 
-  // If possible create a buffered keyboard
-  // (note: if below line doesn't compile, try:  if (mInputSystem->getNumberOfDevices(OIS::OISKeyboard) > 0) {
-  // if( mInputSystem->numKeyboards() > 0 ) {
-  if (this->mInputSystem->getNumberOfDevices(OIS::OISKeyboard) > 0)
-  {
-    OIS::Object *object = this->mInputSystem->createInputObject(OIS::OISKeyboard, true);
-    OIS::Keyboard *keyboard = reinterpret_cast<OIS::Keyboard*>(object);
-    keyboard->setEventCallback(this);
-    device = new OisKeyboard(keyboard);
-  }
-  return device;
-}
-
-Device* OisInputManager::createMouse()
-{
-  Device *device = NULL;
-
-  if (this->mInputSystem->getNumberOfDevices(OIS::OISMouse) > 0)
-  {
-    OIS::Object *object = this->mInputSystem->createInputObject(OIS::OISMouse, true);
-    OIS::Mouse *mouse = reinterpret_cast<OIS::Mouse*>(object);
-    mouse->setEventCallback(this);
-    device = new OisMouse(mouse);
-  }
-  return device;
-}
-
-bool OisInputManager::destroyDevice(Device *device)
-{
-  assert (this->remove(device));
-  delete device;
+  Device::Manager::getPointer()->getFactory(device->getType())->destroy(device);
   return true;
 }
 
-bool OisInputManager::keyPressed( const OIS::KeyEvent &e )
+/*
+bool InputManager::Impl::povMoved( const Ois::JoyStickEvent &e, int pov )
 {
   return true;
 }
 
-bool OisInputManager::keyReleased( const OIS::KeyEvent &e )
+bool InputManager::Impl::axisMoved( const Ois::JoyStickEvent &e, int axis )
 {
   return true;
 }
 
-bool OisInputManager::mouseMoved( const OIS::MouseEvent &e )
+bool InputManager::Impl::sliderMoved( const Ois::JoyStickEvent &e, int sliderID )
 {
   return true;
 }
 
-bool OisInputManager::mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id )
+bool InputManager::Impl::buttonPressed( const Ois::JoyStickEvent &e, int button )
 {
   return true;
 }
 
-bool OisInputManager::mouseReleased( const OIS::MouseEvent &e, OIS::MouseButtonID id )
+bool InputManager::Impl::buttonReleased( const Ois::JoyStickEvent &e, int button )
 {
   return true;
 }
+*/
 
-bool OisInputManager::povMoved( const OIS::JoyStickEvent &e, int pov )
-{
-  return true;
-}
-
-bool OisInputManager::axisMoved( const OIS::JoyStickEvent &e, int axis )
-{
-  return true;
-}
-
-bool OisInputManager::sliderMoved( const OIS::JoyStickEvent &e, int sliderID )
-{
-  return true;
-}
-
-bool OisInputManager::buttonPressed( const OIS::JoyStickEvent &e, int button )
-{
-  return true;
-}
-
-bool OisInputManager::buttonReleased( const OIS::JoyStickEvent &e, int button )
-{
-  return true;
-}

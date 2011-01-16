@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file TbbTraits.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,24 +30,39 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_CONCURRENCY_IMPL_TBBTRAITS_H
+#define RSSD_CORE_CONCURRENCY_IMPL_TBBTRAITS_H
 
+#include "System"
 #include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
 
 namespace RSSD {
 namespace Core {
 namespace Concurrency {
+namespace Impl {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+struct TbbTraits
+{
+  typedef uint32_t IdType;
+  typedef tbb::continue_msg InputType;
+  typedef void OutputType;
+  typedef BaseTask<TbbTraits> TaskType;
 
+  static IdType generateTaskId()
+  {
+    static volatile bool INITIALIZED = false;
+    static const IdType INITIAL_VALUE = 1;
+    static const IdType STEP_SIZE = 1;
+    static tbb::atomic<IdType> COUNTER;
+    if (!INITIALIZED) { COUNTER = INITIAL_VALUE; INITIALIZED = true; }
+
+    return COUNTER.fetch_and_add(STEP_SIZE);
+  }
+}; /// struct TbbTraits
+
+} /// namespace Impl
 } /// namespace Concurrency
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif /// RSSD_CORE_CONCURRENCY_IMPL_TBBTRAITS_H

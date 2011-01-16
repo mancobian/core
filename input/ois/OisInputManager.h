@@ -36,44 +36,45 @@
 #include <OIS/OIS.h>
 #include "System"
 #include "Pattern"
-#include "input/InputManager.h"
+#include "input/Device.h"
+#include "input/ois/OisTraits.h"
 
 namespace RSSD {
 namespace Core {
 namespace Input {
+namespace Impl {
 
-class OisInputManager :
-  public OIS::KeyListener,
-  public OIS::MouseListener,
-  public OIS::JoyStickListener,
-  public IInputManager
+class OisInputManager : public Pattern::Manager<Device*>
+  // public ::OIS::JoyStickListener
 {
 public:
-  typedef SharedPointer<OisInputManager> Pointer;
+  typedef OisTraits Traits;
+  typedef Pattern::Manager<Device*> DeviceManager;
 
-  OisInputManager(const uint_t windowHandle);
+  OisInputManager(Traits::WindowHandleType windowHandle = 0);
   virtual ~OisInputManager();
-  virtual Device* createDevice(const uint_t type);
-  virtual bool destroyDevice(Device *device);
-  virtual bool update(const float_t elapsed);
+  static OIS::Type toOisType(const uint32_t type);
+  bool isDeviceAvailable(const OIS::Type type) const;
+  Device* createDevice(const uint32_t type);
+  Device* createDevice(const uint32_t type, const bool isBuffered);
+  bool destroyDevice(Device *device);
+  bool update(const float_t elapsed);
+  bool create(const Traits::WindowHandleType windowHandle);
+  bool destroy();
 
 protected:
-  Device* createKeyboard();
-  Device* createMouse();
-  virtual bool keyPressed( const OIS::KeyEvent &e );
-  virtual bool keyReleased( const OIS::KeyEvent &e );
-  virtual bool mouseMoved( const OIS::MouseEvent &e );
-  virtual bool mousePressed( const OIS::MouseEvent &e, OIS::MouseButtonID id );
-  virtual bool mouseReleased( const OIS::MouseEvent &e, OIS::MouseButtonID id );
+  OIS::InputManager *mInputSystem;
+
+  /*
   virtual bool povMoved( const OIS::JoyStickEvent &e, int pov );
   virtual bool axisMoved( const OIS::JoyStickEvent &e, int axis );
   virtual bool sliderMoved( const OIS::JoyStickEvent &e, int sliderID );
   virtual bool buttonPressed( const OIS::JoyStickEvent &e, int button );
   virtual bool buttonReleased( const OIS::JoyStickEvent &e, int button );
-
-  OIS::InputManager* mInputSystem;
+  */
 }; /// class OisInputManager
 
+} /// namespace Impl
 } /// namespace Input
 } /// namespace Core
 } /// namespace RSSD

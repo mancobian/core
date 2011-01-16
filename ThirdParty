@@ -53,6 +53,18 @@
 
 #include <predef/predef.h>
 
+///
+/// Intel Thread Building Blocks
+///
+
+#define TBB_PREVIEW_GRAPH 1
+#define TBB_PREVIEW_CONCURRENT_PRIORITY_QUEUE 1
+#include <tbb/tbb.h>
+#include <tbb/graph.h>
+#include <tbb/concurrent_priority_queue.h>
+
+
+#if 0
 /// 
 /// LibCDS (Concurrent Data Structures)
 ///
@@ -77,5 +89,6 @@
 #include <cds/ordered_list/lazy_list_hrc.h>
 #include <cds/ordered_list/lazy_list_ptb.h>
 #include <cds/ordered_list/lazy_list_nogc.h>
+#endif
 
 #endif // RSSD_CORE_SYSTEM_THIRDPARTY

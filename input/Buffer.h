@@ -36,7 +36,7 @@
 #include <stdexcept>
 #include <iomanip>
 #include "System"
-#include "Log"
+#include "Utilities"
 
 namespace RSSD {
 namespace Core {

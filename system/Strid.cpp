@@ -1,7 +1,7 @@
 #include "Strid.h"
 
 using namespace RSSD;
-using namespace RSSD::Core;
+// using namespace RSSD::Core;
 
 boost::mutex Strid::HASHMUTEX;
 Strid::id_s Strid::HASHSET;

@@ -56,6 +56,7 @@
 #include <mutex>
 #include <thread>
 #include <tr1/memory>
+#include <tr1/functional>
 
 #include <boost/thread.hpp>
 #include <boost/thread/barrier.hpp>
@@ -63,7 +64,7 @@
 #include "ThirdParty"
 
 namespace RSSD {
-namespace Core {
+// namespace Core {
 
 ///
 /// Primitives
@@ -88,6 +89,7 @@ typedef int32_t int_t ;
 typedef uint32_t uint_t ;
 typedef float32_t float_t;
 #define SharedPointer std::tr1::shared_ptr
+typedef std::map<uint32_t, boost::any> params_t;
 class Void {};
 
 ///
@@ -120,9 +122,13 @@ typedef std::map<__TYPE*, __TYPE*> __TYPE##_m;
 	const PROPERTY_TYPE& get##PROPERTY_NAME() const { return CLASS_MEMBER; } \
 	void set##PROPERTY_NAME (const PROPERTY_TYPE &value) { CLASS_MEMBER = value; }
 
-#define DEFINE_INLINE_PROPERTY(PROPERTY_TYPE, PROPERTY_NAME, CLASS_MEMBER) \
-	inline const PROPERTY_TYPE& get##PROPERTY_NAME() const { return CLASS_MEMBER; } \
-	inline void set##PROPERTY_NAME (const PROPERTY_TYPE &value) { CLASS_MEMBER = value; }
+#define DEFINE_PROPERTY_INLINE(PROPERTY_TYPE, PROPERTY_NAME, CLASS_MEMBER) \
+	FORCE_INLINE const PROPERTY_TYPE& get##PROPERTY_NAME() const { return CLASS_MEMBER; } \
+	FORCE_INLINE void set##PROPERTY_NAME (const PROPERTY_TYPE &value) { CLASS_MEMBER = value; }
+
+#define DEFINE_PROPERTY_INLINE_VOLATILE(PROPERTY_TYPE, PROPERTY_NAME, CLASS_MEMBER) \
+  FORCE_INLINE const volatile PROPERTY_TYPE& get##PROPERTY_NAME() const { return CLASS_MEMBER; } \
+  FORCE_INLINE void set##PROPERTY_NAME (const PROPERTY_TYPE &value) { CLASS_MEMBER = value; }
 
 ///
 /// Typedefs
@@ -166,7 +172,7 @@ typedef boost::variant<
 
 // namespace Math = Eigen;
 
-} // namespace Core
+// } // namespace Core
 } // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_TYPES_H

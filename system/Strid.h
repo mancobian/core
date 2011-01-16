@@ -36,7 +36,7 @@
 #include "Types.h"
 
 namespace RSSD {
-namespace Core {
+// namespace Core {
 
 /// @note 'id' is a keyword in some languages.
 /// @todo Consider alternatives to 'id' as a variable name.
@@ -117,7 +117,9 @@ protected:
   string_t _text;
 }; // class Strid
 
-} // namespace Core
+#define STRID(x) Strid(#x)
+
+// } // namespace Core
 } // namespace RSSD
 
 #endif // RSSD_CORE_SYSTEM_STRID_H

@@ -30,36 +30,52 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_INPUT_OISKEYBOARD_H
-#define RSSD_CORE_INPUT_OISKEYBOARD_H
+#ifndef RSSD_CORE_INPUT_IMPL_OISKEYBOARD_H
+#define RSSD_CORE_INPUT_IMPL_OISKEYBOARD_H
 
 #include <OIS/OIS.h>
 #include "input/Keyboard.h"
+#include "input/ois/OisTraits.h"
 #include "input/ois/OisDevice.h"
 
 namespace RSSD {
 namespace Core {
 namespace Input {
+namespace Impl {
 
 class OisKeyboard :
-  public Keyboard,
-  public OisDevice
+  public OIS::KeyListener,
+  public OisDevice<OIS::Keyboard>
 {
 public:
-  typedef Device::Factory::Impl<OisKeyboard> Factory;
-  typedef SharedPointer<OisKeyboard> Pointer;
+  static const uint32_t TYPE = Device::Types::KEYBOARD;
 
-  OisKeyboard(OIS::Keyboard *keyboard);
+  class State
+  {
+  public:
+    static const uint32_t NUM_KEYS = 256;
+
+    State();
+    virtual ~State();
+    const uint32_t getKeyState(const uint32_t keycode) const { return this->mKeys[keycode]; }
+
+  protected:
+    uint32_t mKeys[NUM_KEYS];
+  }; /// class State
+
+  OisKeyboard(params_t &params);
   virtual ~OisKeyboard();
-  OIS::Object *getOisObject() { return this->mKeyboard; }
-  virtual bool update(const float_t elapsed) { return true; }
+  bool update(const float32_t elapsed);
+  virtual bool keyPressed(const OIS::KeyEvent &e);
+  virtual bool keyReleased(const OIS::KeyEvent &e);
 
 protected:
-  OIS::Keyboard *mKeyboard;
+  State mState;
 }; /// class OisKeyboard
 
+} /// namespace Impl
 } /// namespace Input
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_INPUT_OISKEYBOARD_H
+#endif // RSSD_CORE_INPUT_IMPL_OISKEYBOARD_H

@@ -1,5 +1,5 @@
 ///
-/// @file Concurrency.h
+/// @file TimerImpl.h
 /// @author Mancobian Poemandres
 /// @license BSD License
 ///
@@ -30,24 +30,35 @@
 /// USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ///
 
-#ifndef RSSD_CORE_CONCURRENCY
-#define RSSD_CORE_CONCURRENCY
+#ifndef RSSD_CORE_TIMER_IMPL_POSIXTIMER_H
+#define RSSD_CORE_TIMER_IMPL_POSIXTIMER_H
 
-#include "concurrency/Task.h"
-#include "concurrency/Scheduler.h"
-#include "concurrency/tbb/TbbTraits.h"
-#include "concurrency/tbb/TbbTask.h"
-#include "concurrency/tbb/TbbScheduler.h"
+#include <sys/time.h>
+#include "System"
+#include "utilities/Timer.h"
 
 namespace RSSD {
 namespace Core {
-namespace Concurrency {
+namespace Utilities {
+namespace Impl {
 
-typedef BaseTask<Impl::TbbTask> BasicTask;
-typedef Scheduler<Impl::TbbScheduler> BasicScheduler;
+struct PosixTimer
+{
+public:
+  PosixTimer(params_t &params);
+  ~PosixTimer();
+  void start();
+  void stop();
+  void reset();
+  uint64_t getMicroseconds() const;
 
-} /// namespace Concurrency
+protected:
+  timeval _start, _stop;
+}; // class PosixTimer
+
+} /// namespace Impl
+} /// namespace Utilities
 } /// namespace Core
 } /// namespace RSSD
 
-#endif // RSSD_CORE_CONCURRENCY
+#endif /// RSSD_CORE_TIMER_IMPL_POSIXTIMER_H
